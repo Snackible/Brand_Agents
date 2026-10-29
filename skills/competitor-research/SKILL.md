@@ -23,6 +23,8 @@ Never skip step 3 to save time: a report without a stored snapshot makes next we
 
 ## 0. First run in a new environment (preflight)
 
+Assume the person running this is not technical. Talk in plain words, one step at a time; say in one sentence what you are about to do and why; do the technical work yourself instead of handing over commands; and ask them only for things that need a human (a click, a sign-in, a decision).
+
 Skills travel to other Claudes, but the computer, the browser and the Google account do not. So before the first collection in an environment, or whenever a collector fails to start, check what is available and give the person every missing item in one message, instead of letting them find the gaps one failure at a time.
 
 1. Run `python scripts/preflight.py --config config.md --data $DATA` (`$DATA` is the data folder from section 2). It checks Python, the `requests` and `playwright` packages, that headless Chromium starts, and that the data folder is writable. It installs nothing.

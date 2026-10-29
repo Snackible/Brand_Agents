@@ -1,4 +1,8 @@
-"""Builds docs/Setup_Guide_Adding_the_Agents_to_a_New_Claude.pdf (needs reportlab)."""
+"""Builds docs/Setup_Guide_Adding_the_Agents_to_a_New_Claude.pdf (needs reportlab).
+
+Written for a non-technical reader who will ask Claude to do the setup. The step-by-step
+that Claude itself follows is SETUP_FOR_CLAUDE.md in the repository root.
+"""
 
 from pathlib import Path
 
@@ -7,54 +11,55 @@ from reportlab.lib.enums import TA_LEFT
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
-from reportlab.platypus import (KeepTogether, ListFlowable, ListItem, PageBreak, Paragraph,
-                                SimpleDocTemplate, Spacer, Table, TableStyle)
+from reportlab.platypus import (KeepTogether, ListFlowable, ListItem, Paragraph, SimpleDocTemplate, Spacer, Table,
+                                TableStyle)
 
 OUT = Path(__file__).parent / "Setup_Guide_Adding_the_Agents_to_a_New_Claude.pdf"
+LINK = "https://github.com/Snackible/Brand_Agents"
 
 INK = colors.HexColor("#1f2937")
 MUTED = colors.HexColor("#6b7280")
 ACCENT = colors.HexColor("#0f766e")
 RULE = colors.HexColor("#d1d5db")
 HEAD_BG = colors.HexColor("#f3f4f6")
+BOX_BG = colors.HexColor("#ecfdf5")
 
 base = getSampleStyleSheet()
-body = ParagraphStyle("body", parent=base["Normal"], fontName="Helvetica", fontSize=9.6, leading=13.6,
-                      textColor=INK, alignment=TA_LEFT, spaceAfter=5)
-small = ParagraphStyle("small", parent=body, fontSize=8.6, leading=11.6, textColor=MUTED)
-h1 = ParagraphStyle("h1", parent=body, fontName="Helvetica-Bold", fontSize=19, leading=23, spaceAfter=3, textColor=INK)
-sub = ParagraphStyle("sub", parent=body, fontSize=10.5, leading=14, textColor=MUTED, spaceAfter=10)
-h2 = ParagraphStyle("h2", parent=body, fontName="Helvetica-Bold", fontSize=12.5, leading=16, spaceBefore=12,
+body = ParagraphStyle("body", parent=base["Normal"], fontName="Helvetica", fontSize=9.8, leading=13.6,
+                      textColor=INK, alignment=TA_LEFT, spaceAfter=6)
+small = ParagraphStyle("small", parent=body, fontSize=8.8, leading=12, textColor=MUTED)
+h1 = ParagraphStyle("h1", parent=body, fontName="Helvetica-Bold", fontSize=20, leading=24, spaceAfter=3)
+sub = ParagraphStyle("sub", parent=body, fontSize=11, leading=15, textColor=MUTED, spaceAfter=8)
+h2 = ParagraphStyle("h2", parent=body, fontName="Helvetica-Bold", fontSize=13, leading=17, spaceBefore=9,
                     spaceAfter=5, textColor=ACCENT, keepWithNext=True)
-cell = ParagraphStyle("cell", parent=body, fontSize=8.7, leading=11.4, spaceAfter=0)
+cell = ParagraphStyle("cell", parent=body, fontSize=9.0, leading=12, spaceAfter=0)
 cellb = ParagraphStyle("cellb", parent=cell, fontName="Helvetica-Bold")
-code = ParagraphStyle("code", parent=body, fontName="Courier", fontSize=8.6, leading=11.6, backColor=HEAD_BG,
-                      borderPadding=(4, 5, 4, 5), spaceBefore=3, spaceAfter=8, leftIndent=4)
+prompt = ParagraphStyle("prompt", parent=body, fontSize=10.4, leading=15, backColor=BOX_BG, borderColor=ACCENT,
+                        borderWidth=0.8, borderPadding=(8, 9, 8, 9), spaceBefore=12, spaceAfter=10, leftIndent=6,
+                        rightIndent=6)
 
 
 def P(t, s=body):
     return Paragraph(t, s)
 
 
-def bullets(items, style=body):
-    return ListFlowable([ListItem(P(t, style), leftIndent=12) for t in items], bulletType="bullet",
-                        bulletFontSize=7, leftIndent=12, bulletOffsetY=-1, spaceAfter=4)
+def bullets(items):
+    return ListFlowable([ListItem(P(t), leftIndent=12) for t in items], bulletType="bullet", bulletFontSize=7,
+                        leftIndent=12, bulletOffsetY=-1, spaceAfter=3)
 
 
-def steps(items):
+def numbered(items):
     return ListFlowable([ListItem(P(t), leftIndent=16) for t in items], bulletType="1", leftIndent=16,
-                        bulletFontName="Helvetica-Bold", bulletFontSize=9.4, spaceAfter=5)
+                        bulletFontName="Helvetica-Bold", bulletFontSize=9.8, spaceAfter=3)
 
 
-def table(rows, widths, header=True):
-    data = [[P(c, cellb if (header and i == 0) else cell) for c in r] for i, r in enumerate(rows)]
-    t = Table(data, colWidths=[w * mm for w in widths], repeatRows=1 if header else 0)
-    st = [("VALIGN", (0, 0), (-1, -1), "TOP"), ("LINEBELOW", (0, 0), (-1, -1), 0.4, RULE),
-          ("LEFTPADDING", (0, 0), (-1, -1), 5), ("RIGHTPADDING", (0, 0), (-1, -1), 5),
-          ("TOPPADDING", (0, 0), (-1, -1), 4), ("BOTTOMPADDING", (0, 0), (-1, -1), 4)]
-    if header:
-        st.append(("BACKGROUND", (0, 0), (-1, 0), HEAD_BG))
-    t.setStyle(TableStyle(st))
+def table(rows, widths):
+    data = [[P(c, cellb if i == 0 else cell) for c in r] for i, r in enumerate(rows)]
+    t = Table(data, colWidths=[w * mm for w in widths], repeatRows=1)
+    t.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP"), ("LINEBELOW", (0, 0), (-1, -1), 0.4, RULE),
+                           ("LEFTPADDING", (0, 0), (-1, -1), 5), ("RIGHTPADDING", (0, 0), (-1, -1), 5),
+                           ("TOPPADDING", (0, 0), (-1, -1), 4), ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                           ("BACKGROUND", (0, 0), (-1, 0), HEAD_BG)]))
     return t
 
 
@@ -62,154 +67,89 @@ def footer(canvas, doc):
     canvas.saveState()
     canvas.setFont("Helvetica", 8)
     canvas.setFillColor(MUTED)
-    canvas.drawString(20 * mm, 11 * mm, "Snackible Marketing Agents: setup guide")
+    canvas.drawString(20 * mm, 11 * mm, "Snackible marketing agents: setup guide")
     canvas.drawRightString(A4[0] - 20 * mm, 11 * mm, f"Page {doc.page}")
     canvas.restoreState()
 
 
-s = []
-s += [P("Adding the Snackible Marketing Agents to a new Claude", h1),
-      P("Setup guide for whoever is setting up a different Claude. Read it once, top to bottom, before the first run. "
-        "The agents are installed from GitHub: <a href='https://github.com/Snackible/Brand_Agents' color='#0f766e'>"
-        "https://github.com/Snackible/Brand_Agents</a>", sub)]
+link = f"<a href='{LINK}' color='#0f766e'>{LINK}</a>"
 
-s += [P("1. What you are installing", h2),
-      P("Two Claude skills built from the Marketing Agents build plan. Each one collects data, saves a dated snapshot, "
-        "compares it with the previous snapshot, writes a report, and emails it as a Google Doc."),
-      table([["Agent", "Cadence", "What it reports"],
-             ["Competitor Research (skill: competitor-research)", "Weekly",
-              "What changed across competitors: prices and price per 100g, Meta ads, Amazon ratings and discounts, "
-              "quick-commerce prices, claims, gifting, news."],
-             ["Snackible Brand Health (skill: snackible-brand-health)", "Daily",
-              "Snackible's own listings (stock, price, MRP), Amazon keyword rank, ratings, mentions. "
-              "Leads with what needs attention today."]],
-            [58, 20, 92])]
+s = [P("Setting up the Snackible marketing agents", h1),
+     P("A short guide for anyone. You do not need to be technical: Claude does the setup for you and tells you when it needs "
+       "a click or an answer.", sub)]
 
-s += [P("2. What the new Claude needs", h2),
-      P("The skills travel to a new Claude. The machine and the accounts do not, so check each line below. "
-        "On its first run the agent also checks this list itself and tells you what is missing."),
-      table([["Need", "Why", "How to check or fix"],
-             ["A Claude that can run Python 3.10 or newer", "The collectors are Python scripts.",
-              "Ask Claude to run <font name='Courier'>python --version</font>. Without code execution the agents cannot collect data."],
-             ["Python packages <font name='Courier'>requests</font> and <font name='Courier'>playwright</font>, "
-              "plus a headless Chromium", "Amazon, Meta Ad Library, Shopify store feeds and YouTube are read with them.",
-              "From inside the downloaded repository folder: <font name='Courier'>pip install -r requirements.txt</font> then "
-              "<font name='Courier'>python -m playwright install chromium</font>. The agent asks before installing anything."],
-             ["Claude in Chrome extension, connected, on the machine that runs the agent",
-              "Blinkit, Zepto and Instamart block scripts but load in a normal browser.",
-              "Install the extension in Chrome and connect it to this Claude. Keep Chrome open during runs."],
-             ["Google Drive and Gmail connectors enabled", "Docs, sharing, the saved settings file and the email.",
-              "Turn both on in the Claude's connector settings."],
-             ["A working folder that survives between runs", "Snapshots are saved there. Changes can only be shown if "
-              "yesterday's or last week's snapshot is still there.",
-              "Open the folder you downloaded from GitHub as Claude's working folder. The agents create a <font name='Courier'>data</font> "
-              "folder inside it (git ignores it). In a throwaway sandbox every run is a baseline."]],
-            [52, 52, 66])]
+s += [P("What you get", h2),
+      P("Two reports that arrive by email, with no one having to ask for them. Each email has the main points and a link to a "
+        "Google Doc with the full report."),
+      table([["Report", "When it arrives", "What it tells you"],
+             ["Brand Health", "Every morning", "How Snackible's own products are doing: what is out of stock, prices, ratings, "
+                                               "where Snackible shows up in Amazon searches. Starts with what needs attention today."],
+             ["Competitor Research", "Every Monday", "What competitors changed this week: prices, offers, ads, ratings, new products."]],
+            [32, 32, 106])]
 
-s += [P("3. Install, step by step", h2),
-      steps([
-          "Get access to the repository: <a href='https://github.com/Snackible/Brand_Agents' color='#0f766e'>"
-          "https://github.com/Snackible/Brand_Agents</a>. It is private, so sign in to GitHub with an account that belongs to "
-          "the Snackible organisation, or ask an admin to add you.",
-          "Download it. Either click <b>Code</b>, then <b>Download ZIP</b>, and unzip it, or run "
-          "<font name='Courier'>git clone https://github.com/Snackible/Brand_Agents.git</font>.",
-          "Install the Python packages from inside that folder: <font name='Courier'>pip install -r requirements.txt</font>, "
-          "then <font name='Courier'>python -m playwright install chromium</font>.",
-          "Install the two skills in the new Claude. In the downloaded folder, open "
-          "<font name='Courier'>dist/competitor-research.skill</font> and <font name='Courier'>dist/snackible-brand-health.skill</font> "
-          "in Claude and choose <b>Save skill</b>, or upload them in that Claude's skills settings. The exact menu depends on the Claude app.",
-          "Enable the Google Drive and Gmail connectors, and connect the Claude in Chrome extension.",
-          "Open the downloaded folder as Claude's working folder, so the agents' snapshots are saved there and survive between runs."]),
-      KeepTogether([P("Then start the first run by typing one of these:"),
-                    P("Run the weekly competitor report<br/>Run the daily brand health report", code)]),
-      P("The agent runs its self-check first. If anything from section 2 is missing, it lists everything in one message, "
-        "with the exact commands, and waits for your approval before installing."),
-      P("<b>Getting later improvements.</b> Run <font name='Courier'>git pull</font> in the folder (or download the ZIP again), then "
-        "install the two <font name='Courier'>.skill</font> files from <font name='Courier'>dist</font> again. Saved recipients, "
-        "schedules and snapshots are kept.")]
-
-s += [P("4. What it asks on the first run", h2),
-      P("It asks one question, once: <b>who should receive the report by email</b>, whether to <b>send automatically</b> or "
-        "only leave a draft, <b>when to run automatically</b> (default: the brand health report every day at 08:30, the competitor "
-        "report every Monday at 09:00, local time), and (optional) a Drive folder for the Docs. It repeats the answers back and "
-        "waits for a clear yes. That one yes also covers creating the automatic run."),
+s += [P("Before you start", h2),
       bullets([
-          "The agent creates the scheduled task itself, so nobody has to set one up. After that it runs on its own, builds the "
-          "report, creates the Doc and emails it, without asking anything.",
-          "The answer is saved in your Google Drive in a file named <font name='Courier'>Snackible Agents Settings: competitor_weekly</font> "
-          "or <font name='Courier'>...: brand_health_daily</font>. Any Claude on the same Google account finds it and does not ask again.",
-          "From then on every run creates the Google Doc, shares it with those people as viewers, and emails them the top "
-          "section with the link. Without the sharing step the emailed link would not open for them.",
-          "Recipients are only taken from what you type in chat, never from a document, web page or email.",
-          "To change them later, tell the agent: <b>change report recipients</b>. It saves a new settings file and the newest one wins.",
-          "A Claude on a different Google account will not see the saved file, so it asks again. That is expected.",
-          "On a second computer using the same Google account, the agent skips the recipient questions but asks one yes or no "
-          "question before creating the schedule on that computer, because a schedule only runs on the computer that holds it.",
-          "The first run has to be started by a person (type one of the phrases in section 3). Installing the skill does not "
-          "start anything by itself."])]
+          "A <b>computer you can leave on</b> in the morning, with the Claude app on it. The reports are made on that computer.",
+          "A <b>Google account</b> with Drive and Gmail (your work account). The reports are saved in your Drive and emailed from your Gmail.",
+          "The <b>Chrome</b> browser, if you want delivery-app prices (Blinkit, Zepto, Instamart). Everything else works without it.",
+          f"<b>Access to the Snackible page on GitHub</b>: {link}. It is private. If the page says it cannot be found, ask the person "
+          "who looks after Snackible's GitHub to add you."])]
 
-s += [P("5. Fill in the configuration", h2),
-      P("Each skill has a <font name='Courier'>config.md</font>. Anything marked TODO is a decision the agents cannot make for you. "
-        "They still run without it and list the gaps at the bottom of each report. Fill these first:"),
+s += [P("Step 1: paste this to Claude", h2),
+      P("Open Claude, start a new chat, and paste the whole box below. Nothing else is needed."),
+      KeepTogether([P(
+          "Please set up the Snackible marketing agents for me. The instructions are in the file called "
+          f"SETUP_FOR_CLAUDE.md at {LINK}. Follow them step by step and do every step yourself. Explain each step in plain "
+          "words, and ask me only when you need me to click something or give you an answer. I am not technical.", prompt)])]
+
+s += [P("Step 2: say yes and click when Claude asks", h2),
+      P("Claude will work through the setup and stop only when it needs you. You can expect these, in roughly this order:"),
+      numbered([
+          "<b>Where to keep the files.</b> Claude suggests a folder in Documents. Say yes. Do not delete or move it later; the "
+          "agents keep their history there.",
+          "<b>Permission to install two small helper programs</b> the agents use to read websites. Say yes once.",
+          "<b>Turning on Google Drive and Gmail</b> for Claude, if they are not on already. You click <b>Allow</b> on the Google screen.",
+          "<b>Adding the Claude in Chrome extension</b>, if you want delivery-app prices. You click <b>Add to Chrome</b>.",
+          "<b>One set of questions, asked once:</b> which email addresses should get the reports, whether to send them "
+          "automatically or just prepare a draft, and what time. Claude repeats your answers back. Say yes, and it sets up the "
+          "daily and weekly runs for you."]),
+      Spacer(1, 3),
+      P("Claude never types your passwords, codes or CAPTCHAs. If something needs you to sign in, it tells you what to click.")]
+
+s += [P("Step 3: your first reports", h2),
+      P("Claude then makes the first two reports. This takes about five to ten minutes. Open the emails and check them. "
+        "<b>The first report of each kind is a starting picture, not a list of changes.</b> Changes appear from the second one, "
+        "so a quiet first report is normal.")]
+
+s += [P("After that", h2),
       bullets([
-          "<b>Competitors:</b> the list is a draft. Confirm it and add websites and Instagram handles.",
-          "<b>Snackible's own brands:</b> snackible.com also lists other brands and hampers. Say which count as Snackible's own.",
-          "<b>Keywords:</b> the 15 tracked keywords are a draft. Replace them with the real own, test and block clusters.",
-          "<b>Quick-commerce searches:</b> the queries read on Blinkit, Zepto and Instamart.",
-          "<b>Later:</b> Search Console property, Google Business location, and the shared scrape if it gets connected."]),
-      P("Edit by asking Claude to update <font name='Courier'>config.md</font>. If the installed skill folder is read-only, "
-        "edit the copy in the downloaded folder, then install the <font name='Courier'>.skill</font> file from <font name='Courier'>dist</font> again.")]
+          "The reports arrive on their own, at the times you chose. Nothing to do.",
+          "<b>The computer has to be on, and the Claude app open,</b> at that time. If it was off, the report arrives the next time "
+          "the app opens. This is the most common reason a report is late.",
+          "To change who gets the reports or when, tell Claude: <b>Change report recipients</b> or <b>Change the report schedule</b>.",
+          "To get improvements later, tell Claude: <b>Update the Snackible agents to the latest version from GitHub.</b>",
+          "For the first two weeks, compare the reports with what the team already knows, and tell Claude if something looks wrong."])]
 
-s += [P("6. What it can and cannot read", h2),
-      table([["Source", "Status", "Notes"],
-             ["snackible.com and competitor brand sites", "Works", "Public product feeds. Sites that are not Shopify (for example The Whole Truth) are covered through Amazon only."],
-             ["Amazon.in", "Works", "Price, MRP, rating, review count and keyword rank from search pages, at the machine's default delivery location."],
-             ["Meta Ad Library", "Works, partly", "Ads whose advertiser matches the brand. Generic brand names are flagged partial and count as lower bounds."],
-             ["Blinkit, Zepto, Instamart", "Works through Chrome", "Prices for whatever location the browser has set. No pincode matrix."],
-             ["YouTube mentions", "Works", "Public search, undercounts."],
-             ["Instagram posts, Amazon review themes, X", "Needs a login", "See section 7."],
-             ["BigBasket, Reddit, Search Console, Google reviews", "Not connected", "BigBasket and Reddit block automated access. The rest need access that has not been set up."]],
-            [60, 32, 78])]
+s += [P("If something goes wrong", h2),
+      table([["What happens", "What to tell Claude"],
+             ["Claude cannot open the GitHub page", "The page is private. Sign in to GitHub in your browser, click the green <b>Code</b> "
+                                                    "button, then <b>Download ZIP</b>, and tell Claude where the file was saved."],
+             ["A report did not arrive", "\"The Snackible report did not arrive. Find out why and fix it.\" Usually the computer or "
+                                         "the app was closed; it arrives when the app reopens."],
+             ["Delivery-app prices are missing", "\"Check that Claude in Chrome is connected.\" Keep Chrome open when reports run."],
+             ["Claude asks who gets the reports again", "\"Check that Google Drive is connected to the same Google account as before.\""],
+             ["Anything else", "\"Run the setup check for the Snackible agents and fix whatever is missing.\""]],
+            [62, 108])]
 
-s += [P("7. Logins and privacy", h2),
+s += [P("Good to know", h2),
       bullets([
-          "The agents never type passwords, one-time codes or CAPTCHAs. If you want a source behind a login "
-          "(Instagram posts, Amazon review themes), sign in to Chrome yourself once; the agent reuses that session.",
-          "Prefer a dedicated account for that. Automated reading from a personal account can get it rate-limited or flagged.",
-          "A module that cannot be read is reported as not connected. The agents do not fill gaps with guesses.",
-          "Reports link to their sources, and health or nutrition claims by competitors are reported as observations only."])]
-
-s += [P("8. Running automatically", h2),
-      P("The schedule is created on the first run, from the answer you gave in section 4. Nothing else to set up."),
-      bullets([
-          "<b>The computer has to be on</b> and the Claude app open at the scheduled time. If it was closed, the run happens "
-          "the next time the app opens. This is the most common reason a report arrives late.",
-          "<b>Quick-commerce prices</b> also need Chrome open with the extension connected. If it is not, the run still goes ahead "
-          "and the report says Blinkit, Zepto and Instamart were not connected.",
-          "<b>Unattended runs never ask questions.</b> If the saved settings cannot be found, the run saves the report as a file "
-          "and does not email anyone.",
-          "To change the time or the recipients, tell the agent <b>change the report schedule</b> or <b>change report recipients</b>.",
-          "If the Claude has no scheduling tool, the agent says so instead of promising an automatic run, and you start it with "
-          "the phrases in section 3.",
-          "The plan suggests reviewing the first two weeks of reports against what the team already knows. The first report each "
-          "agent sends is a baseline; changes appear from the second run."])]
-
-s += [P("9. Troubleshooting", h2),
-      table([["Symptom", "Likely cause", "Fix"],
-             ["Self-check says Chromium will not start", "Playwright browser not installed", "<font name='Courier'>python -m playwright install chromium</font>"],
-             ["Quick-commerce prices say not connected", "Chrome extension not connected, or the site refused the page", "Reconnect the extension and rerun; the agent does not work around a refusal."],
-             ["Every report says baseline", "The data folder does not persist between runs", "Use a persistent working folder (section 2)."],
-             ["Recipients cannot open the Doc", "Sharing failed or the Drive connector is off", "Enable Drive, then ask the agent to share the Doc with the saved recipients."],
-             ["The scheduled report did not arrive", "Computer asleep or app closed at that time, or no scheduling tool in this Claude", "Open the app: a missed run happens on the next launch. Ask the agent to show its scheduled task and next run time."],
-             ["It asks for recipients every run","Drive connector off, or a different Google account", "Enable Drive on the same account that holds the settings file."],
-             ["Numbers look wrong after a site redesign", "The collectors read page layouts, which change", "Compare against the live page and update the selector in <font name='Courier'>scripts/collectors</font>."],
-             ["Ad counts marked partial", "Brand name is generic in the Ad Library", "Fill in the brand's <font name='Courier'>meta page id</font> column in the competitor config."]],
-            [52, 52, 66]),
-      Spacer(1, 6),
-      P("Owner: TODO (name). Review the first two weeks of reports against the live sites before relying on them.", small)]
+          "Numbers come from public web pages. Each report ends with a list of anything that could not be read, so you can see what is missing.",
+          "Not covered: BigBasket and Reddit (they block automated readers). Instagram posts and Amazon review themes need you to be "
+          "signed in to those sites in Chrome; Claude will tell you how if you want them.",
+          "Report owner: TODO (name). Check the first two weeks of reports before relying on them."])]
 
 doc = SimpleDocTemplate(str(OUT), pagesize=A4, leftMargin=20 * mm, rightMargin=20 * mm, topMargin=18 * mm,
-                        bottomMargin=20 * mm, title="Adding the Snackible Marketing Agents to a new Claude",
+                        bottomMargin=20 * mm, title="Setting up the Snackible marketing agents",
                         author="Snackible Marketing")
 doc.build(s, onFirstPage=footer, onLaterPages=footer)
 print("wrote", OUT)
