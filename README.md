@@ -49,7 +49,7 @@ The agents never enter passwords, OTPs or CAPTCHAs. For any source behind a logi
 
 ## Running it
 
-Install from GitHub: <https://github.com/Snackible/Brand_Agents> (private; you need access through the Snackible organisation).
+Install from GitHub: <https://github.com/Snackible/Brand_Agents> (public, no GitHub account needed to download).
 
 1. Download it (**Code, Download ZIP**, or `git clone https://github.com/Snackible/Brand_Agents.git`).
 2. From inside the folder: `pip install -r requirements.txt`, then `python -m playwright install chromium`.

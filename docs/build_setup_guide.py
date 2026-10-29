@@ -92,8 +92,7 @@ s += [P("Before you start", h2),
           "A <b>computer you can leave on</b> in the morning, with the Claude app on it. The reports are made on that computer.",
           "A <b>Google account</b> with Drive and Gmail (your work account). The reports are saved in your Drive and emailed from your Gmail.",
           "The <b>Chrome</b> browser, if you want delivery-app prices (Blinkit, Zepto, Instamart). Everything else works without it.",
-          f"<b>Access to the Snackible page on GitHub</b>: {link}. It is private. If the page says it cannot be found, ask the person "
-          "who looks after Snackible's GitHub to add you."])]
+          f"An internet connection. The agents are downloaded from a public page on GitHub ({link}); you do not need a GitHub account."])]
 
 s += [P("Step 1: paste this to Claude", h2),
       P("Open Claude, start a new chat, and paste the whole box below. Nothing else is needed."),
@@ -132,7 +131,7 @@ s += [P("After that", h2),
 
 s += [P("If something goes wrong", h2),
       table([["What happens", "What to tell Claude"],
-             ["Claude cannot open the GitHub page", "The page is private. Sign in to GitHub in your browser, click the green <b>Code</b> "
+             ["Claude cannot open the GitHub page", "Open the page in your browser, click the green <b>Code</b> "
                                                     "button, then <b>Download ZIP</b>, and tell Claude where the file was saved."],
              ["A report did not arrive", "\"The Snackible report did not arrive. Find out why and fix it.\" Usually the computer or "
                                          "the app was closed; it arrives when the app reopens."],

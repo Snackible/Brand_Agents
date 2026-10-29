@@ -15,7 +15,7 @@ What you are setting up: two Claude skills, `competitor-research` (a weekly repo
 
 1. Ask where to keep them, and suggest a normal folder such as `Documents/Snackible-Agents`. The folder must stay on this computer between runs, because the agents save their history in it.
 2. Download the repository `https://github.com/Snackible/Brand_Agents` into that folder, using `git clone`, the GitHub CLI, or the ZIP link, whichever works on this computer.
-3. The repository is private. If the download is refused, do not try to log in for the person. Tell them: "Please open the GitHub page in your browser, sign in, click the green Code button, then Download ZIP, and tell me where it saved." If they cannot see the page, they need an admin of the Snackible GitHub organisation to add them. Then unzip it into the folder yourself.
+3. The repository is public, so no GitHub login is needed. If the download still fails (for example the computer blocks it), do not try to work around it. Tell the person: "Please open the GitHub page in your browser, click the green Code button, then Download ZIP, and tell me where it saved." Then unzip it into the folder yourself.
 
 ## Step 2: Install what the agents need
 
