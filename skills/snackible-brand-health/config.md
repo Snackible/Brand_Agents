@@ -112,6 +112,7 @@ What "title / image compliance" means for Snackible listings. TODO: confirm with
 Recipients, send mode and the Drive folder are not kept here. On the first run the agent asks once and saves them to the Drive file `Snackible Agents Settings: brand_health_daily` (see SKILL.md, section 6), so they carry over to any Claude on the same Google account. To change them, tell the agent "change report recipients".
 
 - Channel: email (Gmail), with the report as a Google Doc shared with the recipients as viewers
+- Schedule: created automatically on the first run (every day at 08:30, local time) and saved in the same settings file. Say "change the report schedule" to move it.
 
 ## Thresholds
 

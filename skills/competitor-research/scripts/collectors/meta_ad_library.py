@@ -17,7 +17,7 @@ from urllib.parse import quote_plus
 
 from playwright.sync_api import sync_playwright
 
-from common import Snapshot, UA, md_table, utf8_stdout
+from common import Snapshot, UA, md_table, real, utf8_stdout
 
 URL = ("https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=IN"
        "&q={q}&search_type=keyword_unordered&media_type=all")
@@ -54,8 +54,14 @@ def parse_ads(text):
     return ads
 
 
-def collect_brand(page, brand, max_scrolls=10):
-    page.goto(URL.format(q=quote_plus(brand)), timeout=60000, wait_until="domcontentloaded")
+PAGE_URL = ("https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=IN"
+            "&view_all_page_id={pid}&search_type=page&media_type=all")
+
+
+def collect_brand(page, brand, max_scrolls=10, page_id=""):
+    # With a Page ID the search is limited to that advertiser, which fixes generic brand names.
+    page.goto(PAGE_URL.format(pid=page_id) if page_id else URL.format(q=quote_plus(brand)),
+              timeout=60000, wait_until="domcontentloaded")
     page.wait_for_timeout(7000)
     total_match = re.search(r"~?([\d,]+)\s+results?", page.inner_text("body"))
     total = int(total_match.group(1).replace(",", "")) if total_match else None
@@ -75,22 +81,25 @@ def collect_brand(page, brand, max_scrolls=10):
 def run(a):
     snap = Snapshot()
     today = dt.date.today()
-    brands = [a.brand] if a.brand else [r["brand"] for r in md_table(a.config, "Competitors")]
+    if a.brand:
+        targets = [(a.brand, "")]
+    else:
+        targets = [(r["brand"], real(r.get("meta page id", ""))) for r in md_table(a.config, "Competitors")]
     with sync_playwright() as p:
         b = p.chromium.launch(headless=True)
         ctx = b.new_context(locale="en-US", user_agent=UA, viewport={"width": 1366, "height": 900},
                             extra_http_headers={"Accept-Language": "en-US,en;q=0.9"})
         page = ctx.new_page()
-        for brand in brands:
+        for brand, page_id in targets:
             try:
-                ads, total, loaded = collect_brand(page, brand)
+                ads, total, loaded = collect_brand(page, brand, page_id=page_id)
             except Exception as e:
                 snap.status("paid_ads", brand, "failed", f"Ad Library did not load: {str(e)[:120]}", "Meta Ad Library")
                 print(f"{brand}: FAILED {str(e)[:80]}")
                 continue
             key = brand.lower().replace("!", "").replace(" ", "")
             own = [x for x in ads if key in x["advertiser"].lower().replace("!", "").replace(" ", "")]
-            url = URL.format(q=quote_plus(brand))
+            url = PAGE_URL.format(pid=page_id) if page_id else URL.format(q=quote_plus(brand))
             partial = bool(total and loaded < total)
             note = f"advertiser-matched ads among {loaded} loaded of ~{total} keyword results" + (
                 "; scroll limit reached, count is a lower bound" if partial else "")

@@ -7,16 +7,16 @@ Last reviewed: 2026-10-29
 
 ## Competitors
 
-DRAFT list, to be confirmed by Marketing. Remove, add or reorder freely. `Priority` decides ordering in the report (1 = always cover in depth).
+DRAFT list, to be confirmed by Marketing. Remove, add or reorder freely. `meta page id` is optional: the number in the Ad Library URL (`view_all_page_id=`) for the brand's Facebook page; set it for brands whose name is generic so the ad count is exact. `Priority` decides ordering in the report (1 = always cover in depth).
 
-| brand | priority | website | instagram | amazon brand store | notes |
-|---|---|---|---|---|---|
-| Farmley | 1 | https://farmley.com | TODO | TODO | TODO confirm |
-| Happilo | 1 | https://happilo.com | TODO | TODO | TODO confirm |
-| The Whole Truth | 1 | https://thewholetruthfoods.com | TODO | TODO | TODO confirm |
-| Too Yumm! | 2 | TODO | TODO | TODO | TODO confirm |
-| Yoga Bar | 2 | TODO | TODO | TODO | TODO confirm |
-| Open Secret | 2 | TODO | TODO | TODO | TODO confirm |
+| brand | priority | website | instagram | amazon brand store | meta page id | notes |
+|---|---|---|---|---|---|---|
+| Farmley | 1 | https://farmley.com | TODO | TODO | TODO | TODO confirm |
+| Happilo | 1 | https://happilo.com | TODO | TODO | TODO | TODO confirm |
+| The Whole Truth | 1 | https://thewholetruthfoods.com | TODO | TODO | TODO | TODO confirm |
+| Too Yumm! | 2 | TODO | TODO | TODO | TODO | TODO confirm |
+| Yoga Bar | 2 | TODO | TODO | TODO | TODO | TODO confirm |
+| Open Secret | 2 | TODO | TODO | TODO | TODO | TODO confirm |
 
 ## Channels
 
@@ -87,6 +87,7 @@ Optional now: D2C, Amazon, Blinkit and Zepto are collected directly. The shared 
 Recipients, send mode and the Drive folder are not kept here. On the first run the agent asks once and saves them to the Drive file `Snackible Agents Settings: competitor_weekly` (see SKILL.md, section 6), so they carry over to any Claude on the same Google account. To change them, tell the agent "change report recipients".
 
 - Channel: email (Gmail), with the report as a Google Doc shared with the recipients as viewers
+- Schedule: created automatically on the first run (every Monday at 09:00, local time) and saved in the same settings file. Say "change the report schedule" to move it.
 
 ## Thresholds
 
