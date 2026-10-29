@@ -2,7 +2,7 @@
 
 > **Setting this up for someone?** Give them [the setup guide](docs/Setup_Guide_Adding_the_Agents_to_a_New_Claude.pdf) (plain language, two pages). They paste one message to Claude, and Claude follows [SETUP_FOR_CLAUDE.md](SETUP_FOR_CLAUDE.md) to do every step.
 
-Two Claude agents for Snackible Marketing, built from [Marketing_Agents_Build_Plan.docx](Marketing_Agents_Build_Plan.docx).
+Two Claude agents for Snackible Marketing, built from Snackible Marketing's internal build plan.
 
 | Agent | Skill | Cadence | What it reports |
 |---|---|---|---|
