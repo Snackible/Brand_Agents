@@ -20,16 +20,30 @@ DRAFT list, to be confirmed by Marketing. Remove, add or reorder freely. `Priori
 
 ## Channels
 
-Where SKUs and prices are tracked. `needs feed` = only available through the shared scrape.
+Where SKUs and prices are tracked. `script` = collected by `scripts/collectors` (headless). `chrome` = collected through Claude in Chrome (the person's own browser), using `scripts/chrome/extract_qc.js`. `needs feed` = not reachable; reported as "not connected".
 
-| channel | status |
-|---|---|
-| Brand D2C site | on |
-| Amazon.in | on |
-| Blinkit | needs feed |
-| Zepto | needs feed |
-| Swiggy Instamart | needs feed |
-| BigBasket | needs feed |
+| channel | status | how |
+|---|---|---|
+| Brand D2C site | on | script: Shopify product feed (The Whole Truth is not Shopify, so it is covered via Amazon only) |
+| Amazon.in | on | script: search pages, top 15 per brand |
+| Blinkit | on | chrome, browser's current location |
+| Zepto | on | chrome, browser's current location |
+| Swiggy Instamart | on | chrome, no login needed; read the page promptly after it loads, because a login prompt can appear a few seconds later |
+| BigBasket | needs feed | blocks automated access; use the shared scrape |
+
+Quick-commerce prices vary by location. The Chrome collectors read whatever location the browser has set. Note it in the report; a per-pincode matrix needs the shared scrape.
+
+## Quick-commerce queries
+
+Searched on each `chrome` channel; every result for a competitor brand is recorded. DRAFT, adjust to the categories that matter.
+
+| query |
+|---|
+| roasted makhana |
+| protein bar |
+| millet chips |
+| ragi chips |
+| healthy snacks |
 
 ## Modules
 
@@ -41,11 +55,11 @@ Where SKUs and prices are tracked. `needs feed` = only available through the sha
 | claims | on | v1 | brand sites, Amazon listings |
 | gifting | on | v1 | brand sites, LinkedIn (public posts) |
 | paid_ads | on | v1 | Meta Ad Library |
-| content | on | v1 | Instagram (public profiles) |
-| content_posts | on | v1 | Instagram (public profiles) |
-| reviews | off | v2 | Amazon.in reviews |
-| sku_tracker | needs feed | v2 | shared scrape |
-| price | needs feed | v2 | shared scrape |
+| content | on | v1 | chrome: Instagram public profile, followers only (post feed needs a login) |
+| content_posts | needs feed | v1 | Instagram post feed needs a login; not connected |
+| reviews | on | v2 | script: Amazon.in rating and review count; complaint themes read from review pages through Chrome when time allows |
+| sku_tracker | on | v2 | script (D2C, Amazon) + chrome (Blinkit, Zepto, Instamart) |
+| price | on | v2 | script (D2C, Amazon) + chrome (Blinkit, Zepto, Instamart) |
 
 ## Shared scrape
 
@@ -54,12 +68,13 @@ Where SKUs and prices are tracked. `needs feed` = only available through the sha
 - Refresh frequency: TODO
 - Format (columns): TODO
 
-When these are filled in, switch `sku_tracker` and `price` to `on` and add the mapping to `references/modules.md`.
+Optional now: D2C, Amazon, Blinkit and Zepto are collected directly. The shared scrape would add BigBasket and a per-pincode view. Add its mapping to `references/modules.md` when it is connected.
 
 ## Snapshot sheet
 
 - Google Sheet name: `Marketing Agents: Competitor Snapshots`
-- Link: TODO (create the sheet with one tab per module, headers per `references/snapshot-schema.md`)
+- History is stored as dated CSV files in `data/competitor/<YYYY-MM-DD>/` (one file per collector). The diff reads these directly.
+- Optional: mirror to the Google Sheet. Link: TODO
 
 ## Report mode
 

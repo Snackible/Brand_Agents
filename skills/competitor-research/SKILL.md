@@ -17,6 +17,7 @@ Never skip step 3 to save time: a report without a stored snapshot makes next we
 - `references/modules.md` — for each module: what to collect, where, how to name rows, and known gotchas. Read the section for each module you are running.
 - `references/report-template.md` — the exact report structure. Read before writing the report.
 - `references/snapshot-schema.md` — the snapshot sheet layout and row conventions. Read before writing or reading snapshot rows.
+- `scripts/collectors/` — headless collectors and the Chrome importer; `scripts/chrome/extract_qc.js` — in-page extractor run through Claude in Chrome.
 - `scripts/diff_snapshots.py` — compares the current snapshot to the previous one using the thresholds in `config.md`.
 
 ## 1. Load config
@@ -28,30 +29,52 @@ Read `config.md`. Note:
 
 ## 2. Collect
 
-For each module that is `on`, follow its section in `references/modules.md`. General rules:
+Snapshots live in a data folder, one subfolder per run date: `data/competitor/<YYYY-MM-DD>/`, one CSV per collector. In the project repo that is `data/competitor/` at the repo root; if the skill is installed on its own, use `./data/competitor/` in the working directory. Call it `$DATA` below.
 
-- **Prefer official and existing sources** (Meta Ad Library, brand sites, the shared scrape) over aggressive scraping. Platform terms matter and fragile scraping produces noise.
-- **Capture a source URL for every row.** The report links to evidence; a claim without a link is not useful to the team.
-- **Record what you observed, not what you infer.** If a page didn't load or a search returned nothing, record that as a collection failure (see snapshot schema), don't fill the gap with a guess. A wrong "competitor dropped prices" line costs more than a missing one.
-- If the browser or web tools can't reach a source (quick-commerce sites often block automated access), mark the module `partial` or `failed` and move on.
+**Step A: headless collectors (one command).** Run from the skill folder:
 
-Keep a short collection log as you go: module, sources tried, rows collected, failures. It feeds the data-freshness section.
+```bash
+python scripts/collectors/run_headless.py weekly --config config.md --data $DATA
+```
+
+This collects D2C catalogues and prices (Shopify feeds), Amazon.in listings, prices, ratings and review counts for each brand, and active Meta ads with days live, hooks and offers. It takes several minutes. Read `$DATA/<date>/_run.json`: any collector marked `ok: false` is a failed module for the data-freshness section. Rows with metric `_collection_status` inside the CSVs are partial or failed sources; carry them into the report too.
+
+**Step B: quick commerce through Claude in Chrome.** Blinkit and Zepto (and Instamart) block headless access but load in the person's own Chrome. If Claude in Chrome is not connected, skip this step and report these channels as "not connected" rather than guessing. Otherwise, for each channel in `config.md` marked `chrome` and each query in the "Quick-commerce queries" table:
+1. Open a new tab and navigate to the search URL (`https://blinkit.com/s/?q=<query>`, `https://www.zeptonow.com/search?query=<query>`, `https://www.swiggy.com/instamart/search?query=<query>`).
+2. Wait about 5 seconds, then run the contents of `scripts/chrome/extract_qc.js` with the JavaScript tool, prefixed with `window.__qcBrands = [...]; window.__qcFrom = 0;` listing the competitor brands from `config.md` (this filters in the page so the output stays small), straight away (Instamart can show a login prompt a few seconds after load; do not sign in).
+3. Save the JSON it returns to `$DATA/<date>/chrome/<channel>_<query>_1.json`. The browser tool cuts output at about 1,000 characters, so a long result arrives in chunks: after the first run the extractor stays on the page, so run `window.__qc()` again for the next chunk and keep going until `from` plus the number of items reaches the number of matching products (a response with fewer items than the brand count and no [TRUNCATED] marker is the last one). Save each response as `..._1.json`, `..._2.json` and so on; the importer merges them. If a response ends in `[TRUNCATED]`, set `window.__qcFrom` to its `from` value and run `window.__qc()` again. If `total` is 0, that channel/query failed (a `total` above 0 with no items just means none of the tracked brands appeared); say so in the report.
+4. Pause a few seconds between pages. Do not enter any credentials, OTPs or addresses, and stop and tell the person if a CAPTCHA or sign-in wall blocks you.
+Then convert the files:
+
+```bash
+python scripts/collectors/chrome_import.py competitors --config config.md --out $DATA/<date>/quick_commerce.csv $DATA/<date>/chrome/*.json
+```
+
+The prices are for the location the browser has set; note that in the report.
+
+**Step C: Instagram followers through Claude in Chrome.** For each competitor with an Instagram handle in `config.md`, open `https://www.instagram.com/<handle>/` and read the follower count from the page text ("430K followers"). Write rows `content | <brand> | followers | <number>` to `$DATA/<date>/instagram.csv` (snapshot schema, `source` = Instagram). Only the public profile is readable without a login, so post cadence and engagement are not collected; do not sign in to get them.
+
+**Step D: web research (news, claims, gifting).** Follow the news, claims and gifting sections of `references/modules.md` using web search and page reads, and write the rows to `$DATA/<date>/manual.csv` using the snapshot schema. Claims can also be read from the D2C/Amazon titles already collected.
+
+General rules:
+- **Prefer official and existing sources** (Meta Ad Library, brand feeds). Do not try to get around bot checks, CAPTCHAs or login walls; record the module as failed or partial and move on.
+- **Capture a source URL for every row.** The report links to evidence.
+- **Record what you observed, not what you infer.** A page that did not load is a collection failure, not a change.
+- Keep a short collection log for the data-freshness section.
 
 ## 3. Store the snapshot
 
-Write the collected rows to the snapshot sheet named in `config.md`, following `references/snapshot-schema.md` (one tab per module, long format: `snapshot_date, module, entity, metric, value, unit, source, source_url, notes`). Use today's run date as `snapshot_date` for every row in this run.
-
-If you can't write to the sheet (no Google Sheets access in this session, permission error), save the rows as `competitor_snapshot_<YYYY-MM-DD>.csv`, attach or link it in the delivery, and put "Snapshot not saved to the sheet. Rows attached, please paste them into the sheet" at the top of the report. Don't silently drop the snapshot.
+The files from step 2 in `$DATA/<date>/` are the snapshot; there is nothing to upload for the diff to work. Check that every file uses the columns in `references/snapshot-schema.md`. If the team also wants the Google Sheet, append the same rows there as a second copy, but the CSV folder stays the source of truth.
 
 ## 4. Diff against last week
 
-Export the snapshot tabs (or read them) as CSV including at least the previous snapshot and the current one, then run:
+Run the diff over every snapshot folder (it compares the latest date with the one before it, per module):
 
 ```bash
-python scripts/diff_snapshots.py --config config.md <tab CSVs...>
+python scripts/diff_snapshots.py --config config.md $DATA/*/*.csv
 ```
 
-Add `--format json` if you want structured output. The script reports, per module: status (ok / first snapshot / possibly partial), new entities, removed entities, and metric changes that crossed a threshold. Changes below threshold are only counted, not listed, which is deliberate: they are noise for a weekly read.
+Add `--format json` for structured output. The script reports, per module: status (ok / first snapshot / possibly partial), new entities, removed entities, and metric changes that crossed a threshold in `config.md`. Sub-threshold changes are counted, not listed, to keep the weekly read short. Note that Amazon and quick-commerce results are search results, so a "removed" listing there means it dropped out of the results, not necessarily that it was delisted; say so rather than reporting a delisting.
 
 Then add judgment on top of the script output:
 - **Text modules** (news, claims, gifting, ad hooks) mostly show up as "new entity" rows. Read them and decide which matter for Snackible.

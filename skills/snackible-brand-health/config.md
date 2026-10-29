@@ -7,7 +7,11 @@ Last reviewed: 2026-10-29
 
 ## SKUs
 
-The Snackible SKUs to track. `Priority 1` SKUs are always covered and their issues rank higher in "Needs attention today". Use the same SKU name everywhere (it becomes part of the snapshot entity).
+The whole snackible.com catalogue (about 100 listings) is checked automatically every day for stock and price, so this table is only for SKUs that need extra attention. `Priority 1` SKUs rank higher in "Needs attention today" and are matched on Amazon by name.
+
+Note for the owner: snackible.com also lists other brands (for example GoatLife, Bubz, JoySpoon, Gul Jaipur) and festive hampers. Decide which count as Snackible's own, and list them here or set `Own brands` below so the report separates them.
+
+Own brands: TODO (default: everything on snackible.com is reported)
 
 | sku | pack size (g) | MRP (₹) | priority | D2C URL | Amazon ASIN | notes |
 |---|---|---|---|---|---|---|
@@ -17,15 +21,19 @@ The Snackible SKUs to track. `Priority 1` SKUs are always covered and their issu
 
 ## Channels
 
+`script` = headless collectors in `scripts/collectors`. `chrome` = Claude in Chrome (the person's own browser) with `scripts/chrome/extract_qc.js`.
+
 | channel | status | data source |
 |---|---|---|
-| Snackible D2C (snackible.com) | on | site pages |
-| Amazon.in | on | listing pages / Seller Central export (TODO which) |
-| Blinkit | needs feed | shared scrape |
-| Zepto | needs feed | shared scrape |
-| Swiggy Instamart | needs feed | shared scrape |
-| BigBasket | needs feed | shared scrape |
-| Google reviews | on | Google Business Profile (TODO location link) |
+| Snackible D2C (snackible.com) | on | script: Shopify product feed (whole catalogue) |
+| Amazon.in | on | script: brand search page (price, MRP, rating, review count) and keyword rank |
+| Blinkit | on | chrome: search for each tracked keyword, browser's current location |
+| Zepto | on | chrome: same |
+| Swiggy Instamart | on | chrome: no login needed; read promptly after load (a login prompt can appear later) |
+| BigBasket | needs feed | blocks automated access; shared scrape |
+| Google reviews | needs feed | Google Business Profile (TODO location link) |
+
+Quick-commerce results are for the location the browser has set (no pincode matrix). The report states the location.
 
 ## Pincodes
 
@@ -37,13 +45,27 @@ Quick-commerce availability and price vary by pincode. TODO: confirm the set (fo
 
 ## Tracked keywords (about 15)
 
-Clusters: `own` = keywords Snackible should rank for and defend; `test` = keywords being tried; `block` = competitor or category terms to watch. TODO: confirm the list.
+Clusters: `own` = keywords Snackible should rank for and defend; `test` = keywords being tried; `block` = competitor or category terms to watch.
+
+DRAFT list proposed from what snackible.com sells (millet, ragi, jowar, quinoa and chickpea snacks, protein chakli, no-refined-sugar cookies and spreads). Confirm or replace. Rank is checked on Amazon.in and, through Chrome, Blinkit and Zepto.
 
 | keyword | cluster | channel(s) |
 |---|---|---|
-| TODO | own | Amazon.in, Google |
-| TODO | test | Amazon.in |
-| TODO | block | Amazon.in |
+| snackible | own | Amazon.in |
+| ragi chips | own | Amazon.in |
+| jowar puffs | own | Amazon.in |
+| quinoa puffs | own | Amazon.in |
+| millet snacks | own | Amazon.in |
+| protein chakli | own | Amazon.in |
+| baked pizza sticks | own | Amazon.in |
+| no refined sugar cookies | own | Amazon.in |
+| chickpea puffs | test | Amazon.in |
+| healthy chips | test | Amazon.in |
+| high protein snacks | test | Amazon.in |
+| chocolate hazelnut spread | test | Amazon.in |
+| healthy snacks | block | Amazon.in |
+| yoga bar | block | Amazon.in |
+| the whole truth | block | Amazon.in |
 
 ## Listing compliance rules
 
@@ -65,18 +87,19 @@ What "title / image compliance" means for Snackible listings. TODO: confirm with
 
 | module | status | plan phase |
 |---|---|---|
-| reviews (B) | on | Phase 4, first |
-| seo (D) | needs feed | Phase 4, first (needs GSC access) |
-| seo_keywords (D) | needs feed | Phase 4, first |
-| mentions (C) | on | Phase 4, second (public search only until a listening feed exists) |
-| mention_items (C) | on | Phase 4, second |
-| listing (A) | needs feed | Phase 4, last |
-| search_rank (A) | needs feed | Phase 4, last |
+| reviews (B) | on | rating and review count come from the listing collectors; complaint themes are read from Amazon review pages in Chrome when signed in |
+| seo (D) | needs feed | needs GSC access (property TODO) |
+| seo_keywords (D) | needs feed | needs GSC access |
+| mentions (C) | on | YouTube public search (script); Reddit, X, Instagram not connected |
+| mention_items (C) | on | same |
+| listing (A) | on | D2C + Amazon (script), Blinkit + Zepto (chrome) |
+| search_rank (A) | on | Amazon (script), Blinkit + Zepto (chrome) |
 
 ## Snapshot sheet
 
 - Google Sheet name: `Marketing Agents: Brand Health Snapshots`
-- Link: TODO (one tab per module, headers per `references/snapshot-schema.md`)
+- History is stored as dated CSV files in `data/brand_health/<YYYY-MM-DD>/` (one file per collector). The diff reads these directly.
+- Optional: mirror to the Google Sheet. Link: TODO
 
 ## Report mode
 
