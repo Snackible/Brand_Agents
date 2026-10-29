@@ -27,16 +27,20 @@ from common import Snapshot, UA, md_table, parse_grams, price_rows, real, utf8_s
 CARD_JS = r"""
 () => [...document.querySelectorAll('div[data-component-type="s-search-result"][data-asin]')].map((el, i) => {
   const t = (sel) => { const n = el.querySelector(sel); return n ? n.innerText.trim() : ''; };
+  const h2 = [...el.querySelectorAll('h2')].map(h => h.innerText.trim()).filter(Boolean);
   const rating = el.querySelector('i[class*="a-icon-star"] .a-icon-alt, span.a-icon-alt');
-  const reviews = el.querySelector('span[aria-label*="ratings"], a[href*="customerReviews"] span.a-size-base, span.a-size-base.s-underline-text');
+  const reviews = el.querySelector('a[href*="customerReviews"]');
   return {
     asin: el.getAttribute('data-asin'),
-    title: t('h2'),
+    // Current layout: the first h2 is the brand, the last is the product title.
+    brand: h2.length > 1 ? h2[0] : '',
+    title: h2.length ? h2[h2.length - 1] : '',
     price: t('.a-price:not(.a-text-price) .a-offscreen') || t('.a-price .a-price-whole'),
-    mrp: t('.a-price.a-text-price .a-offscreen'),
+    // The struck-through list price; the per-100g unit price is also an a-text-price, so match data-a-strike.
+    mrp: t('.a-price.a-text-price[data-a-strike="true"] .a-offscreen'),
     rating: rating ? rating.textContent : '',
-    reviews: reviews ? (reviews.getAttribute('aria-label') || reviews.textContent) : '',
-    sponsored: /sponsored/i.test(el.innerText.slice(0, 400)),
+    reviews: reviews ? (reviews.getAttribute('aria-label') || reviews.innerText) : '',
+    sponsored: /sponsored/i.test(el.innerText.slice(0, 120)),
     position: i + 1,
   };
 }).filter(c => c.asin)
@@ -94,7 +98,8 @@ class Amazon:
 
 
 def match_brand(card, brand):
-    return brand.lower().replace("!", "") in card["title"].lower().replace("!", "")
+    text = (card.get("brand", "") + " " + card["title"]).lower().replace("!", "")
+    return brand.lower().replace("!", "") in text
 
 
 def run_competitors(a):
