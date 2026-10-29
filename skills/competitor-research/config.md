@@ -84,10 +84,9 @@ Optional now: D2C, Amazon, Blinkit and Zepto are collected directly. The shared 
 
 ## Delivery
 
-- Google Doc folder: TODO (Drive folder link)
-- Recipients: TODO (start with a small group, per Phase 5)
-- Channel: email
-- Auto-send: no
+Recipients, send mode and the Drive folder are not kept here. On the first run the agent asks once and saves them to the Drive file `Snackible Agents Settings: competitor_weekly` (see SKILL.md, section 6), so they carry over to any Claude on the same Google account. To change them, tell the agent "change report recipients".
+
+- Channel: email (Gmail), with the report as a Google Doc shared with the recipients as viewers
 
 ## Thresholds
 

@@ -59,6 +59,8 @@ python skills/competitor-research/scripts/collectors/run_headless.py weekly --co
 python skills/snackible-brand-health/scripts/collectors/run_headless.py daily --config skills/snackible-brand-health/config.md --data data/brand_health
 ```
 
+**Recipients are asked once.** The first time an agent runs in a new Claude it asks who should get the report by email, whether to send automatically or leave a draft, and an optional Drive folder. It saves the answer to a Drive file (`Snackible Agents Settings: competitor_weekly` or `...: brand_health_daily`) and never asks again; every later run creates the Doc, shares it with those people as viewers, and emails them. Recipients are only taken from the person's own chat messages. Say "change report recipients" to update them. Running on a schedule is separate: the agent sends whenever it runs, so a daily send needs the daily run scheduled.
+
 The diff needs at least two dates of data before it reports changes; the first run is a baseline.
 
 ## Still to decide (marked `TODO` in the two `config.md` files)
