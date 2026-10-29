@@ -69,7 +69,9 @@ def footer(canvas, doc):
 
 s = []
 s += [P("Adding the Snackible Marketing Agents to a new Claude", h1),
-      P("Setup guide for whoever is setting up a different Claude. Read it once, top to bottom, before the first run.", sub)]
+      P("Setup guide for whoever is setting up a different Claude. Read it once, top to bottom, before the first run. "
+        "The agents are installed from GitHub: <a href='https://github.com/Snackible/Brand_Agents' color='#0f766e'>"
+        "https://github.com/Snackible/Brand_Agents</a>", sub)]
 
 s += [P("1. What you are installing", h2),
       P("Two Claude skills built from the Marketing Agents build plan. Each one collects data, saves a dated snapshot, "
@@ -91,7 +93,7 @@ s += [P("2. What the new Claude needs", h2),
               "Ask Claude to run <font name='Courier'>python --version</font>. Without code execution the agents cannot collect data."],
              ["Python packages <font name='Courier'>requests</font> and <font name='Courier'>playwright</font>, "
               "plus a headless Chromium", "Amazon, Meta Ad Library, Shopify store feeds and YouTube are read with them.",
-              "<font name='Courier'>pip install requests playwright</font> then "
+              "From inside the downloaded repository folder: <font name='Courier'>pip install -r requirements.txt</font> then "
               "<font name='Courier'>python -m playwright install chromium</font>. The agent asks before installing anything."],
              ["Claude in Chrome extension, connected, on the machine that runs the agent",
               "Blinkit, Zepto and Instamart block scripts but load in a normal browser.",
@@ -100,23 +102,31 @@ s += [P("2. What the new Claude needs", h2),
               "Turn both on in the Claude's connector settings."],
              ["A working folder that survives between runs", "Snapshots are saved there. Changes can only be shown if "
               "yesterday's or last week's snapshot is still there.",
-              "Use a normal folder, or one synced by Drive or OneDrive. In a throwaway sandbox every run is a baseline."]],
+              "Open the folder you downloaded from GitHub as Claude's working folder. The agents create a <font name='Courier'>data</font> "
+              "folder inside it (git ignores it). In a throwaway sandbox every run is a baseline."]],
             [52, 52, 66])]
 
 s += [P("3. Install, step by step", h2),
       steps([
-          "Get the files. They are in the GitHub repository <b>Snackible/Brand_Agents</b> (private, so you need access). "
-          "The folder <font name='Courier'>dist</font> holds <font name='Courier'>competitor-research.skill</font> and "
-          "<font name='Courier'>snackible-brand-health.skill</font>.",
-          "Install both skills in the new Claude: open each <font name='Courier'>.skill</font> file in Claude and choose "
-          "<b>Save skill</b>, or upload it in that Claude's skills settings. The exact menu depends on the Claude app.",
-          "Make sure the Python packages and Chromium from section 2 are installed on the machine where Claude runs code.",
+          "Get access to the repository: <a href='https://github.com/Snackible/Brand_Agents' color='#0f766e'>"
+          "https://github.com/Snackible/Brand_Agents</a>. It is private, so sign in to GitHub with an account that belongs to "
+          "the Snackible organisation, or ask an admin to add you.",
+          "Download it. Either click <b>Code</b>, then <b>Download ZIP</b>, and unzip it, or run "
+          "<font name='Courier'>git clone https://github.com/Snackible/Brand_Agents.git</font>.",
+          "Install the Python packages from inside that folder: <font name='Courier'>pip install -r requirements.txt</font>, "
+          "then <font name='Courier'>python -m playwright install chromium</font>.",
+          "Install the two skills in the new Claude. In the downloaded folder, open "
+          "<font name='Courier'>dist/competitor-research.skill</font> and <font name='Courier'>dist/snackible-brand-health.skill</font> "
+          "in Claude and choose <b>Save skill</b>, or upload them in that Claude's skills settings. The exact menu depends on the Claude app.",
           "Enable the Google Drive and Gmail connectors, and connect the Claude in Chrome extension.",
-          "Pick the working folder and tell Claude to use it for the agents' <font name='Courier'>data</font> folder."]),
+          "Open the downloaded folder as Claude's working folder, so the agents' snapshots are saved there and survive between runs."]),
       KeepTogether([P("Then start the first run by typing one of these:"),
                     P("Run the weekly competitor report<br/>Run the daily brand health report", code)]),
       P("The agent runs its self-check first. If anything from section 2 is missing, it lists everything in one message, "
-        "with the exact commands, and waits for your approval before installing.")]
+        "with the exact commands, and waits for your approval before installing."),
+      P("<b>Getting later improvements.</b> Run <font name='Courier'>git pull</font> in the folder (or download the ZIP again), then "
+        "install the two <font name='Courier'>.skill</font> files from <font name='Courier'>dist</font> again. Saved recipients, "
+        "schedules and snapshots are kept.")]
 
 s += [P("4. What it asks on the first run", h2),
       P("It asks one question, once: <b>who should receive the report by email</b>, whether to <b>send automatically</b> or "
@@ -148,7 +158,7 @@ s += [P("5. Fill in the configuration", h2),
           "<b>Quick-commerce searches:</b> the queries read on Blinkit, Zepto and Instamart.",
           "<b>Later:</b> Search Console property, Google Business location, and the shared scrape if it gets connected."]),
       P("Edit by asking Claude to update <font name='Courier'>config.md</font>. If the installed skill folder is read-only, "
-        "edit the copy in the repository and install the rebuilt <font name='Courier'>.skill</font> file.")]
+        "edit the copy in the downloaded folder, then install the <font name='Courier'>.skill</font> file from <font name='Courier'>dist</font> again.")]
 
 s += [P("6. What it can and cannot read", h2),
       table([["Source", "Status", "Notes"],

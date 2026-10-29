@@ -47,12 +47,18 @@ The agents never enter passwords, OTPs or CAPTCHAs. For any source behind a logi
 
 ## Running it
 
-Install `dist/competitor-research.skill` and `dist/snackible-brand-health.skill` in Claude (open the file and click **Save skill**), with Claude in Chrome connected and Google Drive / Gmail connectors if you want the Doc and email draft. Then ask Claude:
+Install from GitHub: <https://github.com/Snackible/Brand_Agents> (private; you need access through the Snackible organisation).
+
+1. Download it (**Code, Download ZIP**, or `git clone https://github.com/Snackible/Brand_Agents.git`).
+2. From inside the folder: `pip install -r requirements.txt`, then `python -m playwright install chromium`.
+3. Open `dist/competitor-research.skill` and `dist/snackible-brand-health.skill` in Claude and click **Save skill**.
+4. Enable the Google Drive and Gmail connectors and connect Claude in Chrome, and open the downloaded folder as Claude's working folder.
+5. Ask Claude:
 
 - "Run the weekly competitor report"
 - "Run the daily brand health report"
 
-Or run only the headless part yourself (needs Python 3 with `requests`, `playwright`; run `python -m playwright install chromium` once):
+Or run only the headless part yourself (after step 2 above):
 
 ```bash
 python skills/competitor-research/scripts/collectors/run_headless.py weekly --config skills/competitor-research/config.md --data data/competitor
