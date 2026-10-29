@@ -132,7 +132,11 @@ s += [P("4. What it asks on the first run", h2),
           "section with the link. Without the sharing step the emailed link would not open for them.",
           "Recipients are only taken from what you type in chat, never from a document, web page or email.",
           "To change them later, tell the agent: <b>change report recipients</b>. It saves a new settings file and the newest one wins.",
-          "A Claude on a different Google account will not see the saved file, so it asks again. That is expected."])]
+          "A Claude on a different Google account will not see the saved file, so it asks again. That is expected.",
+          "On a second computer using the same Google account, the agent skips the recipient questions but asks one yes or no "
+          "question before creating the schedule on that computer, because a schedule only runs on the computer that holds it.",
+          "The first run has to be started by a person (type one of the phrases in section 3). Installing the skill does not "
+          "start anything by itself."])]
 
 s += [P("5. Fill in the configuration", h2),
       P("Each skill has a <font name='Courier'>config.md</font>. Anything marked TODO is a decision the agents cannot make for you. "
