@@ -1,21 +1,21 @@
-// Quick-commerce search-page extractor, run inside Claude in Chrome (javascript_tool).
-// Works on blinkit.com, zeptonow.com and swiggy.com/instamart search pages that are already
-// loaded. It reads the visible text only.
+// Quick-commerce extractor, run inside Claude in Chrome (javascript_tool) on Blinkit, Zepto or Instamart
+// search results that are already on screen. It reads the visible text only.
 //
-// Before running, prefix the call with the brands to keep, for example:
-//   window.__qcBrands = ["Farmley", "Happilo"]; window.__qcFrom = 0;
-// Only products whose name contains one of those brands come back, which keeps the output small
-// (the browser tool truncates long output). `pos` is the product's position among the organic
-// (non-sponsored) results, so search rank can still be computed; `total` is how many products
-// the page showed, so "page failed to load" (total 0) is distinguishable from "brand not in results".
+// Run it ONCE per channel, prefixed with the brands to keep, e.g.
+//   window.__qcBrands = ["Snackible"]; window.__qcFrom = 0;   <this file>
+// That defines window.__qc() and runs it for the page on screen. For every further keyword, do NOT reload
+// the page (a reload loses the function): type the keyword into the site's own search box, press Enter,
+// wait about 4 seconds, and call `window.__qc()` again. One browser_batch can do all keywords:
+//   [triple_click search box, type keyword, key Return, wait 4, javascript window.__qc()] x keywords.
 //
-// Returns JSON: {"channel","query","from","total","items":[[name,weight,price,mrp,sponsored,pos],...]}
-// The browser tool cuts output at about 1,000 characters, so a long result comes back in chunks: after the
-// first run the function stays on the page, so for the next chunk just run `window.__qc()` again (it
-// continues where it stopped). If a response ends in [TRUNCATED], set window.__qcFrom to that response's
-// `from` and run `window.__qc()` again.
-// Save every response to a file; scripts/collectors/chrome_import.py merges the chunks.
-// Site layouts change: if total comes back 0, report that channel as failed.
+// Only products whose name contains one of the brands come back (the browser tool cuts output at about
+// 1,000 characters). `pos` is the product's position among organic (non-sponsored) results, so search
+// rank can be worked out; `total` is how many products the page showed, so a page that failed to load
+// (total 0) is distinguishable from a brand that is not in the results.
+// Returns {"channel","query","from","total","items":[[name,weight,price,mrp,sponsored,pos],...]}.
+// If a response ends in [TRUNCATED], set window.__qcFrom to its `from` and call window.__qc() again.
+// Save all responses for a channel in ONE file as a JSON list; scripts/collectors/chrome_import.py reads it.
+// Layouts change: if total is 0, report that channel as failed.
 window.__qc = () => {
   const host = location.hostname;
   const channel = host.includes("blinkit") ? "Blinkit"
@@ -73,17 +73,17 @@ window.__qc = () => {
   let organic = 0;
   all.forEach(it => { it.push(it[4] ? 0 : ++organic); });
 
-  const brands = (window.__qcBrands || []).map(b => b.toLowerCase().replace(/[^a-z0-9 ]/g, ""));
-  const keep = all.filter(it => !brands.length ||
-    brands.some(b => it[0].toLowerCase().replace(/[^a-z0-9 ]/g, "").includes(b)));
+  const norm = s => s.toLowerCase().replace(/[^a-z0-9 ]/g, "");
+  const brands = (window.__qcBrands || []).map(norm);
+  const keep = all.filter(it => !brands.length || brands.some(b => norm(it[0]).includes(b)));
 
   const from = window.__qcFrom || 0;
   const items = [];
   let size = 0;
   for (let i = from; i < keep.length; i++) {
-    const it = [keep[i][0].slice(0, 60), keep[i][1], keep[i][2], keep[i][3], keep[i][4], keep[i][5]];
+    const it = [keep[i][0].slice(0, 44), keep[i][1].replace(/^1 pack /, ""), keep[i][2], keep[i][3], keep[i][4], keep[i][5]];
     const len = JSON.stringify(it).length + 1;
-    if (size + len > 650 && items.length) break;
+    if (size + len > 800 && items.length) break;
     items.push(it);
     size += len;
   }
@@ -92,7 +92,7 @@ window.__qc = () => {
   const sp = new URLSearchParams(location.search);
   const query = sp.get("q") || sp.get("query") || "";
   const loc = lines.find(l => /^(delivering to|deliver to|delivery to)/i.test(l)) || "";
-  // Keep the wrapper small: the browser tool cuts output at about 1,000 characters in total.
+  // The query is returned as its own field; a URL with ?q= in the output can be blocked by the browser tool.
   const out = { channel, query, from, total: all.length, items };
   if (loc) out.location = loc;
   return JSON.stringify(out);

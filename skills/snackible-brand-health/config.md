@@ -29,7 +29,7 @@ Own brands: TODO (default: everything on snackible.com is reported)
 | Amazon.in | on | script: brand search page (price, MRP, rating, review count) and keyword rank |
 | Blinkit | on | chrome: search for each tracked keyword, browser's current location |
 | Zepto | on | chrome: same |
-| Swiggy Instamart | on | chrome: no login needed; read promptly after load (a login prompt can appear later) |
+| Swiggy Instamart | off | chrome: no login needed; read promptly after load (a login prompt can appear later) |
 | BigBasket | needs feed | blocks automated access; shared scrape |
 | Google reviews | needs feed | Google Business Profile (TODO location link) |
 

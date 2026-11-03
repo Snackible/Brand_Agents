@@ -50,10 +50,13 @@ def load(paths):
     """Read extractor files and merge the chunks of one page (same channel and query)."""
     chunks = []
     for p in paths:
-        d = json.load(open(p, encoding="utf-8"))
+        with open(p, encoding="utf-8") as fh:
+            d = json.load(fh)
         if isinstance(d, str):
             d = json.loads(d)
-        chunks.append(d)
+        # One file may hold a single response, or a JSON list of responses (one per keyword).
+        for r in (d if isinstance(d, list) else [d]):
+            chunks.append(json.loads(r) if isinstance(r, str) else r)
     pages = {}
     for d in sorted(chunks, key=lambda c: c.get("from", 0)):
         key = (d["channel"], query_of(d))
@@ -74,12 +77,16 @@ def run_competitors(a, pages):
             snap.status("price", f"all | {ch}", "failed", f"no products parsed from {url} (login wall or layout change)", ch)
             continue
         note = f"query '{query_of(d)}'; location: {d.get('location', '')}"
+        seen = set()
         for name, weight, price, mrp, sponsored, *_ in d["items"]:
             b = brand_of(name, brands)
             if not b:
                 continue
             grams = parse_grams(weight) or parse_grams(name)
             entity = f"{b} | {name[:80]} {weight} | {ch}".replace("  ", " ")
+            if entity in seen:
+                continue  # the same product listed twice on one page
+            seen.add(entity)
             snap.add("sku_tracker", entity, "listed", 1, "", ch, url, note)
             snap.add("sku_tracker", entity, "pack_size_g", grams, "g", ch, url)
             price_rows(snap, "price", entity, max(mrp, price), price, grams, ch, url, note)
@@ -92,6 +99,7 @@ def run_own(a, pages):
     for d in pages:
         ch, url = d["channel"], url_of(d)
         kw = query_of(d)
+        seen = set()
         if not d.get("total", len(d["items"])):
             snap.status("listing", f"{a.brand} | {ch}", "failed", f"no products parsed from {url} (login wall or layout change)", ch)
             continue
@@ -104,6 +112,9 @@ def run_own(a, pages):
             if a.brand.lower() not in name.lower():
                 continue
             entity = f"{name[:80]} {weight} | {ch} | default".replace("  ", " ")
+            if entity in seen:
+                continue  # the same product listed twice on one page
+            seen.add(entity)
             note = f"found via '{kw}'; location: {d.get('location', '')}"
             snap.add("listing", entity, "in_stock", 1, "", ch, url, note)
             price_rows(snap, "listing", entity, max(mrp, price), price, None, ch, url, note)
