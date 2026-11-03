@@ -109,6 +109,9 @@ s += [P("Step 2: say yes and click when Claude asks", h2),
           "<b>Permission to install two small helper programs</b> the agents use to read websites. Say yes once.",
           "<b>Turning on Google Drive and Gmail</b> for Claude, if they are not on already. You click <b>Allow</b> on the Google screen.",
           "<b>Adding the Claude in Chrome extension</b>, if you want delivery-app prices. You click <b>Add to Chrome</b>.",
+          "<b>Optional: signing in to a few sites in Chrome.</b> For Instagram post details and Amazon review themes, the agent uses "
+          "the sign-in Chrome already has. If Chrome is not signed in, Claude tells you which sites and waits while <b>you</b> sign in. "
+          "It never types your password or codes.",
           "<b>One set of questions, asked once:</b> which email addresses should get the reports, whether to send them "
           "automatically or just prepare a draft, and what time. Claude repeats your answers back. Say yes, and it sets up the "
           "daily and weekly runs for you."]),
@@ -143,8 +146,8 @@ s += [P("If something goes wrong", h2),
 s += [P("Good to know", h2),
       bullets([
           "Numbers come from public web pages. Each report ends with a list of anything that could not be read, so you can see what is missing.",
-          "Not covered: BigBasket and Reddit (they block automated readers). Instagram posts and Amazon review themes need you to be "
-          "signed in to those sites in Chrome; Claude will tell you how if you want them.",
+          "Not covered: BigBasket and Reddit (they block automated readers). Instagram posts and Amazon review themes are read only "
+          "when Chrome is already signed in to those sites. A sign-in can expire; the report then says which site needs signing in again.",
           "Report owner: TODO (name). Check the first two weeks of reports before relying on them."])]
 
 doc = SimpleDocTemplate(str(OUT), pagesize=A4, leftMargin=20 * mm, rightMargin=20 * mm, topMargin=18 * mm,

@@ -56,8 +56,8 @@ Searched on each `chrome` channel; every result for a competitor brand is record
 | gifting | on | v1 | brand sites, LinkedIn (public posts) |
 | paid_ads | on | v1 | Meta Ad Library |
 | content | on | v1 | chrome: Instagram public profile, followers only (post feed needs a login) |
-| content_posts | needs feed | v1 | Instagram post feed needs a login; not connected |
-| reviews | on | v2 | script: Amazon.in rating and review count; complaint themes read from review pages through Chrome when time allows |
+| content_posts | on | v1 | chrome, if signed in: Instagram post feed needs the person's own signed-in Chrome session (see SKILL step C2); otherwise reported as needs_login |
+| reviews | on | v2 | script: Amazon.in rating and review count; complaint themes read from review pages through Chrome, if signed in to Amazon (see SKILL step C2) |
 | sku_tracker | on | v2 | script (D2C, Amazon) + chrome (Blinkit, Zepto, Instamart) |
 | price | on | v2 | script (D2C, Amazon) + chrome (Blinkit, Zepto, Instamart) |
 

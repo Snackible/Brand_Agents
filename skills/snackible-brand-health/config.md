@@ -87,7 +87,7 @@ What "title / image compliance" means for Snackible listings. TODO: confirm with
 
 | module | status | plan phase |
 |---|---|---|
-| reviews (B) | on | rating and review count come from the listing collectors; complaint themes are read from Amazon review pages in Chrome when signed in |
+| reviews (B) | on | rating and review count come from the listing collectors; complaint themes are read from Amazon review pages through Chrome, if signed in to Amazon (see SKILL step C2); otherwise reported as needs_login |
 | seo (D) | needs feed | needs GSC access (property TODO) |
 | seo_keywords (D) | needs feed | needs GSC access |
 | mentions (C) | on | YouTube public search (script); Reddit, X, Instagram not connected |

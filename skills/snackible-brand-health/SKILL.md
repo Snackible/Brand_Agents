@@ -69,6 +69,13 @@ This writes `listing` rows (in stock, price, MRP) for every Snackible item found
 
 **Step C: reviews.** Rating and review count per listing come from step A. For complaint themes, open the Amazon review pages of the top Snackible listings in Chrome only if the person is already signed in to Amazon; otherwise report themes as not collected. Follow the reviews section of `references/modules.md`, and write rows to `$DATA/<date>/manual.csv`.
 
+**Step C2: sources behind a login, using the person's own Chrome session.** Amazon review pages (complaint themes for Snackible's listings) need a signed-in session. The agent never signs in by itself: it reuses a session that Chrome already holds, and says so when there is none.
+1. For each such site (`config.md` marks them `chrome, if signed in`), open one of its pages in Claude in Chrome and run `scripts/chrome/check_login.js`. It only reports whether a "Log in" prompt is showing.
+2. If `signedIn` is `true`, collect with that session by reading the page text: open `https://www.amazon.in/product-reviews/<ASIN>/` with the critical-reviews filter for Snackible's most-reviewed listings and tag complaint themes as described under `reviews` in `references/modules.md`. Keep it small and slow (a few pages per site, with pauses between them), and treat anything you cannot read as not collected.
+3. If `signedIn` is `false` or `null`, do not try to sign in. Write a `_collection_status` row with value `needs_login` that names the site, and carry on with the other sources.
+4. If a person is present, tell them which sites need a sign-in and ask them to sign in themselves in the Chrome window. They must never give you a password or a code. Wait until they say it is done, then run the check again. If the site offers "Continue with Google" and the person says yes for that site in this run, you may click that button and let them approve Google's own screen; do not do this without a yes for that specific site in this run. Never use saved passwords or autofill, and never accept a browser prompt to save or fill credentials.
+5. If this is an unattended scheduled run, never attempt a sign-in. List the sites that need one in the report's data-freshness section and config gaps, so someone present can fix it. Sessions expire, so a site that worked last week may need signing in again.
+
 **Step D: SEO.** Google Search Console is not connected unless `config.md` says a property and feed are set. If it is, follow the seo section of `references/modules.md`; otherwise report SEO as "not connected". Check the main collection pages of snackible.com for status and product count only if you have time; the D2C catalogue already shows missing products.
 
 General rules:
