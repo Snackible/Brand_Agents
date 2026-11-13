@@ -7,16 +7,16 @@ Last reviewed: 2026-10-29
 
 ## Competitors
 
-DRAFT list, to be confirmed by Marketing. Remove, add or reorder freely. `meta page id` is optional: the number in the Ad Library URL (`view_all_page_id=`) for the brand's Facebook page; set it for brands whose name is generic so the ad count is exact. `Priority` decides ordering in the report (1 = always cover in depth).
+DRAFT list, to be confirmed by Marketing. Remove, add or reorder freely. `meta page id` is optional: the number in the Ad Library URL (`view_all_page_id=`) for the brand's Facebook page; set it for brands whose name is generic so the ad count is exact. `instagram` is the handle without the @; if it is TODO or the profile does not load, the agent searches for the brand (see SKILL step C). `Priority` decides ordering in the report (1 = always cover in depth).
 
 | brand | priority | website | instagram | amazon brand store | meta page id | notes |
 |---|---|---|---|---|---|---|
-| Farmley | 1 | https://farmley.com | TODO | TODO | TODO | TODO confirm |
-| Happilo | 1 | https://happilo.com | TODO | TODO | TODO | TODO confirm |
-| The Whole Truth | 1 | https://thewholetruthfoods.com | TODO | TODO | TODO | TODO confirm |
-| Too Yumm! | 2 | TODO | TODO | TODO | TODO | TODO confirm |
-| Yoga Bar | 2 | TODO | TODO | TODO | TODO | TODO confirm |
-| Open Secret | 2 | TODO | TODO | TODO | TODO | TODO confirm |
+| Farmley | 1 | https://farmley.com | farmleyin | TODO | TODO | TODO confirm |
+| Happilo | 1 | https://happilo.com | happiloindia | TODO | TODO | TODO confirm |
+| The Whole Truth | 1 | https://thewholetruthfoods.com | thewholetruthfoods | TODO | TODO | TODO confirm |
+| Too Yumm! | 2 | TODO | tooyumm | TODO | TODO | TODO confirm |
+| Yoga Bar | 2 | TODO | yogabars.in | TODO | TODO | TODO confirm |
+| Open Secret | 2 | TODO | opensecretsnacks | TODO | TODO | TODO confirm |
 
 ## Channels
 
