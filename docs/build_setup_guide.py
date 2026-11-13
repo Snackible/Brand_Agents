@@ -130,6 +130,8 @@ s += [P("After that", h2),
           "the app opens. This is the most common reason a report is late.",
           "To change who gets the reports or when, tell Claude: <b>Change report recipients</b> or <b>Change the report schedule</b>.",
           "To get improvements later, tell Claude: <b>Update the Snackible agents to the latest version from GitHub.</b>",
+          "<b>If a report needs you</b> (a sign-in, Chrome closed, a connection turned off), Claude stops and asks you, every time, while you are at the "
+          "computer. For scheduled runs nobody can answer, so the email starts with <b>ACTION NEEDED</b> and lists what to do, and Claude asks again the next time you open it.",
           "For the first two weeks, compare the reports with what the team already knows, and tell Claude if something looks wrong."])]
 
 s += [P("If something goes wrong", h2),

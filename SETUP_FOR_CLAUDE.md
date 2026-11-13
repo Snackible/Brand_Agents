@@ -52,7 +52,7 @@ Tell the person: "Now I'll make the first report. It takes about five to ten min
 
 ## Step 6: Tell the person what happens next
 
-Say, in plain words: the reports will arrive by email at the times they chose; the computer has to be on and the Claude app open at those times (a missed report arrives when the app next opens); the first two weeks are worth comparing against what the team already knows; and they can say "change report recipients" or "change the report schedule" at any time.
+Say, in plain words: the reports will arrive by email at the times they chose; the computer has to be on and the Claude app open at those times (a missed report arrives when the app next opens); the first two weeks are worth comparing against what the team already knows; and they can say "change report recipients" or "change the report schedule" at any time. Also tell them: whenever a report needs them (a sign-in, Chrome closed, a connection turned off), Claude stops and asks while they are at the computer; for scheduled runs the email starts with ACTION NEEDED and lists what to do.
 
 If the person wants to understand more, `docs/Setup_Guide_Adding_the_Agents_to_a_New_Claude.pdf` is a short guide written for them.
 

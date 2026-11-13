@@ -34,6 +34,21 @@ Read `config.md`. Note:
 - Any entries still marked `TODO`. Don't invent values for them. Run with what is confirmed and list the gaps under "Config gaps" at the end of the report so the owner can fix them.
 - The report week: Monday–Sunday of the week that just ended, unless the user names a different period.
 
+## 1b. Stop and ask when you need the person
+
+Never skip a source silently and never work around a block. Whenever a step needs something only a person can do, stop, say in plain words exactly what to do, and wait for their reply before going on. Ask again on every run: an earlier "skip" does not carry over.
+
+**Up front, in one message, before collecting** (use the question tool if this Claude has one, otherwise plain text; offer "I've done it" and "Skip this time" for each item):
+- Claude in Chrome connected and responding (needed for Blinkit and Zepto).
+- Signed in, in that Chrome, to each login-gated site in `config.md` (Instagram, Amazon). Open one page of the site and run `scripts/chrome/check_login.js`; never sign in yourself.
+- Google Drive and Gmail connected (needed to create and send the report).
+- Anything listed in `$DATA/pending_actions.md` from an earlier unattended run.
+Wait for the answer, re-check whatever they say they did, and only then collect. If they skip something, mark that module `needs_login` or not connected in the report; do not guess.
+
+**Mid-run blockers** (a CAPTCHA, a sign-in wall that appears, a site refusing the page, a connector or Chrome dropping out): stop at that moment, say what happened and what to do, and wait.
+
+**Unattended runs (started by a schedule):** nobody can answer, so do not wait and do not hang. Skip what is blocked, put a "Needs your help" box at the top of the report listing exactly what to do, start the email subject with `ACTION NEEDED: `, append the same list to `$DATA/pending_actions.md` (one line per item, with the date), and send a push notification if that tool exists. The next attended run asks about those first. Remove a line once it is done.
+
 ## 2. Collect
 
 Snapshots live in a data folder, one subfolder per run date: `data/competitor/<YYYY-MM-DD>/`, one CSV per collector. In the project repo that is `data/competitor/` at the repo root; if the skill is installed on its own, use `./data/competitor/` in the working directory. Call it `$DATA` below.
@@ -46,7 +61,7 @@ python scripts/collectors/run_headless.py weekly --config config.md --data $DATA
 
 This collects D2C catalogues and prices (Shopify feeds), Amazon.in listings, prices, ratings and review counts for each brand, and active Meta ads with days live, hooks and offers. It takes several minutes. Read `$DATA/<date>/_run.json`: any collector marked `ok: false` is a failed module for the data-freshness section. Rows with metric `_collection_status` inside the CSVs are partial or failed sources; carry them into the report too.
 
-**Step B: quick commerce through Claude in Chrome.** Blinkit and Zepto block scripts but load in the person's own Chrome. If Claude in Chrome is not connected, skip this step and report these channels as not connected. Otherwise, for each channel marked `chrome` in `config.md` (Instamart is off by default), do this once per channel, not once per keyword:
+**Step B: quick commerce through Claude in Chrome.** Blinkit and Zepto block scripts but load in the person's own Chrome. If Claude in Chrome is not connected, handle it as in section 1b (ask the person to open Chrome with the extension and wait; if they skip, or the run is unattended, report these channels as not connected). Otherwise, for each channel marked `chrome` in `config.md` (Instamart is off by default), do this once per channel, not once per keyword:
 1. Open the first query's search page (`https://blinkit.com/s/?q=<query>` or `https://www.zeptonow.com/search?query=<query>`), wait about 5 seconds, and `find` the page's search box to get its ref.
 2. Run the contents of `scripts/chrome/extract_qc.js` with `window.__qcBrands = [the competitor brands from `config.md`]; window.__qcFrom = 0;` in front. It defines `window.__qc()` and reads the page on screen.
 3. For every other query, in ONE `browser_batch` call: triple-click the search box ref, type the query, press Return, wait 4 seconds, run `window.__qc()` and then `window.__qc2()` (which returns the rest if the first result was cut short, otherwise just `{"done":true}`). Repeat that group for each query. Never reload or navigate to a new URL in between: that loses the function, whereas typing in the site's own search box does not.
@@ -59,9 +74,9 @@ Use the queries in `config.md` (at most 5 per channel). Prices are for the locat
 **Step C2: sources behind a login, using the person's own Chrome session.** Competitor Instagram posts and Amazon review pages need a signed-in session. The agent never signs in by itself: it reuses a session that Chrome already holds, and says so when there is none.
 1. For each such site (`config.md` marks them `chrome, if signed in`), open one of its pages in Claude in Chrome and run `scripts/chrome/check_login.js`. It only reports whether a "Log in" prompt is showing.
 2. If `signedIn` is `true`, collect with that session by reading the page text: for Instagram, open each competitor's profile and its latest few posts and record likes and comments to work out engagement; for Amazon, open `https://www.amazon.in/product-reviews/<ASIN>/` with the critical-reviews filter for each brand's top listings and tag complaint themes as described under `reviews` in `references/modules.md`. Keep it small and slow (a few pages per site, with pauses between them), and treat anything you cannot read as not collected.
-3. If `signedIn` is `false` or `null`, do not try to sign in. Write a `_collection_status` row with value `needs_login` that names the site, and carry on with the other sources.
+3. If `signedIn` is `false` or `null`, do not try to sign in. Stop and ask as in section 1b. If the person skips, or the run is unattended, write a `_collection_status` row with value `needs_login` that names the site, and carry on with the other sources.
 4. If a person is present, tell them which sites need a sign-in and ask them to sign in themselves in the Chrome window. They must never give you a password or a code. Wait until they say it is done, then run the check again. If the site offers "Continue with Google" and the person says yes for that site in this run, you may click that button and let them approve Google's own screen; do not do this without a yes for that specific site in this run. Never use saved passwords or autofill, and never accept a browser prompt to save or fill credentials.
-5. If this is an unattended scheduled run, never attempt a sign-in. List the sites that need one in the report's data-freshness section and config gaps, so someone present can fix it. Sessions expire, so a site that worked last week may need signing in again.
+5. If this is an unattended scheduled run, never attempt a sign-in and do not wait: follow the unattended rule in section 1b (Needs your help box, ACTION NEEDED subject, pending_actions.md). Sessions expire, so a site that worked last week may need signing in again.
 
 **Step D: web research (news, claims, gifting).** Follow the news, claims and gifting sections of `references/modules.md` using web search and page reads, and write the rows to `$DATA/<date>/manual.csv` using the snapshot schema. Claims can also be read from the D2C/Amazon titles already collected.
 
@@ -115,7 +130,7 @@ Delivery settings live in the Drive file `Snackible Agents Settings: competitor_
 Every run after setup, scheduled or not:
 1. Create a Google Doc titled `Competitor Weekly: W<ISO week> <YYYY> (<Mon d> - <Sun d>)` (in `folder_id` if set) containing the report.
 2. **Share the Doc** with each recipient as a viewer (Drive `share_file`), so the emailed link opens for them. The Doc stays private to everyone else.
-3. **Email** with Gmail: if `mode` is `send`, `send_message` to the saved recipients; if `draft`, `create_draft` and say it is waiting. Subject: the Doc title. Body: the "Top changes" (or "Baseline: what stands out" on the first run) section as plain text plus the Doc link. No attachments and no raw data. Send only to the saved addresses (no extra Cc or Bcc).
+3. **Email** with Gmail: if `mode` is `send`, `send_message` to the saved recipients; if `draft`, `create_draft` and say it is waiting. Subject: the Doc title. Body: the "Top changes" (or "Baseline: what stands out" on the first run) section as plain text plus the Doc link. No attachments and no raw data. If this run left open items for the person (section 1b), start the subject with `ACTION NEEDED: ` and list them at the top of the body. Send only to the saved addresses (no extra Cc or Bcc).
 4. If Docs, Drive sharing or Gmail is unavailable, write the report as Markdown, save `competitor_weekly_<YYYY-MM-DD>.md`, and say which delivery steps did not happen. Do not send a partial or unsourced report.
 
 Finish by telling the person running it: the Doc link, who it was sent to (or that a draft is waiting), the snapshot status, and any config gaps.

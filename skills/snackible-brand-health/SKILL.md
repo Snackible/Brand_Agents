@@ -35,6 +35,21 @@ Read `config.md`. Note which modules are `on`, `off` or `needs feed`, and any `T
 
 The report date is today; the comparison is the most recent earlier snapshot (normally yesterday; after a weekend or outage it may be older, so say which date you compared against).
 
+## 1b. Stop and ask when you need the person
+
+Never skip a source silently and never work around a block. Whenever a step needs something only a person can do, stop, say in plain words exactly what to do, and wait for their reply before going on. Ask again on every run: an earlier "skip" does not carry over.
+
+**Up front, in one message, before collecting** (use the question tool if this Claude has one, otherwise plain text; offer "I've done it" and "Skip this time" for each item):
+- Claude in Chrome connected and responding (needed for Blinkit and Zepto).
+- Signed in, in that Chrome, to each login-gated site in `config.md` (Amazon). Open one page of the site and run `scripts/chrome/check_login.js`; never sign in yourself.
+- Google Drive and Gmail connected (needed to create and send the report).
+- Anything listed in `$DATA/pending_actions.md` from an earlier unattended run.
+Wait for the answer, re-check whatever they say they did, and only then collect. If they skip something, mark that module `needs_login` or not connected in the report; do not guess.
+
+**Mid-run blockers** (a CAPTCHA, a sign-in wall that appears, a site refusing the page, a connector or Chrome dropping out): stop at that moment, say what happened and what to do, and wait.
+
+**Unattended runs (started by a schedule):** nobody can answer, so do not wait and do not hang. Skip what is blocked, put a "Needs your help" box at the top of the report listing exactly what to do, start the email subject with `ACTION NEEDED: `, append the same list to `$DATA/pending_actions.md` (one line per item, with the date), and send a push notification if that tool exists. The next attended run asks about those first. Remove a line once it is done.
+
 ## 2. Collect
 
 Snapshots live in a data folder, one subfolder per run date: `data/brand_health/<YYYY-MM-DD>/`, one CSV per collector. In the project repo that is `data/brand_health/` at the repo root; if the skill is installed on its own, use `./data/brand_health/` in the working directory. Call it `$DATA` below.
@@ -47,7 +62,7 @@ python scripts/collectors/run_headless.py daily --config config.md --data $DATA
 
 This collects: the whole snackible.com catalogue (stock, price, MRP), Snackible's Amazon.in listings (price, MRP, rating, review count), Amazon keyword ranks for the tracked keywords, and public YouTube mentions. Read `$DATA/<date>/_run.json`: a collector with `ok: false` is a failed module for the data-freshness section, and `_collection_status` rows inside the CSVs mark partial or failed sources. Reddit, X and Instagram mentions need a login and are reported as not connected.
 
-**Step B: quick commerce through Claude in Chrome.** Blinkit and Zepto block scripts but load in the person's own Chrome. If Claude in Chrome is not connected, skip this step and report these channels as not connected. Otherwise, for each channel marked `chrome` in `config.md` (Instamart is off by default), do this once per channel, not once per keyword:
+**Step B: quick commerce through Claude in Chrome.** Blinkit and Zepto block scripts but load in the person's own Chrome. If Claude in Chrome is not connected, handle it as in section 1b (ask the person to open Chrome with the extension and wait; if they skip, or the run is unattended, report these channels as not connected). Otherwise, for each channel marked `chrome` in `config.md` (Instamart is off by default), do this once per channel, not once per keyword:
 1. Open the first query's search page (`https://blinkit.com/s/?q=<query>` or `https://www.zeptonow.com/search?query=<query>`), wait about 5 seconds, and `find` the page's search box to get its ref.
 2. Run the contents of `scripts/chrome/extract_qc.js` with `window.__qcBrands = ["Snackible"]; window.__qcFrom = 0;` in front. It defines `window.__qc()` and reads the page on screen.
 3. For every other query, in ONE `browser_batch` call: triple-click the search box ref, type the query, press Return, wait 4 seconds, run `window.__qc()` and then `window.__qc2()` (which returns the rest if the first result was cut short, otherwise just `{"done":true}`). Repeat that group for each query. Never reload or navigate to a new URL in between: that loses the function, whereas typing in the site's own search box does not.
@@ -60,9 +75,9 @@ Search the `own` and `test` keywords from `config.md`, at most 6 per channel; sk
 **Step C2: sources behind a login, using the person's own Chrome session.** Amazon review pages (complaint themes for Snackible's listings) need a signed-in session. The agent never signs in by itself: it reuses a session that Chrome already holds, and says so when there is none.
 1. For each such site (`config.md` marks them `chrome, if signed in`), open one of its pages in Claude in Chrome and run `scripts/chrome/check_login.js`. It only reports whether a "Log in" prompt is showing.
 2. If `signedIn` is `true`, collect with that session by reading the page text: open `https://www.amazon.in/product-reviews/<ASIN>/` with the critical-reviews filter for Snackible's most-reviewed listings and tag complaint themes as described under `reviews` in `references/modules.md`. Keep it small and slow (a few pages per site, with pauses between them), and treat anything you cannot read as not collected.
-3. If `signedIn` is `false` or `null`, do not try to sign in. Write a `_collection_status` row with value `needs_login` that names the site, and carry on with the other sources.
+3. If `signedIn` is `false` or `null`, do not try to sign in. Stop and ask as in section 1b. If the person skips, or the run is unattended, write a `_collection_status` row with value `needs_login` that names the site, and carry on with the other sources.
 4. If a person is present, tell them which sites need a sign-in and ask them to sign in themselves in the Chrome window. They must never give you a password or a code. Wait until they say it is done, then run the check again. If the site offers "Continue with Google" and the person says yes for that site in this run, you may click that button and let them approve Google's own screen; do not do this without a yes for that specific site in this run. Never use saved passwords or autofill, and never accept a browser prompt to save or fill credentials.
-5. If this is an unattended scheduled run, never attempt a sign-in. List the sites that need one in the report's data-freshness section and config gaps, so someone present can fix it. Sessions expire, so a site that worked last week may need signing in again.
+5. If this is an unattended scheduled run, never attempt a sign-in and do not wait: follow the unattended rule in section 1b (Needs your help box, ACTION NEEDED subject, pending_actions.md). Sessions expire, so a site that worked last week may need signing in again.
 
 **Step D: SEO.** Google Search Console is not connected unless `config.md` says a property and feed are set. If it is, follow the seo section of `references/modules.md`; otherwise report SEO as "not connected". Check the main collection pages of snackible.com for status and product count only if you have time; the D2C catalogue already shows missing products.
 
@@ -114,7 +129,7 @@ Delivery settings live in the Drive file `Snackible Agents Settings: brand_healt
 Every run after setup, scheduled or not:
 1. Create a Google Doc titled `Brand Health: <Day, d Mon YYYY>` (in `folder_id` if set) containing the report.
 2. **Share the Doc** with each recipient as a viewer (Drive `share_file`), so the emailed link opens for them. The Doc stays private to everyone else.
-3. **Email** with Gmail: if `mode` is `send`, `send_message` to the saved recipients; if `draft`, `create_draft` and say it is waiting. Subject: the Doc title plus ` (<n> need attention)`. Body: the "Needs attention today" (or "Baseline: current issues" on the first run) section as plain text plus the Doc link. No attachments and no raw data. Send only to the saved addresses (no extra Cc or Bcc).
+3. **Email** with Gmail: if `mode` is `send`, `send_message` to the saved recipients; if `draft`, `create_draft` and say it is waiting. Subject: the Doc title plus ` (<n> need attention)`. Body: the "Needs attention today" (or "Baseline: current issues" on the first run) section as plain text plus the Doc link. No attachments and no raw data. If this run left open items for the person (section 1b), start the subject with `ACTION NEEDED: ` and list them at the top of the body. Send only to the saved addresses (no extra Cc or Bcc).
 4. If Docs, Drive sharing or Gmail is unavailable, write the report as Markdown, save `brand_health_<YYYY-MM-DD>.md`, and say which delivery steps did not happen. Do not send a partial or unsourced report.
 
 Finish by telling the person running it: the Doc link, who it was sent to (or that a draft is waiting), the snapshot status, the number of attention items, and any config gaps.
