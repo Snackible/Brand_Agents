@@ -21,6 +21,7 @@ Don't skip step 3: tomorrow's report depends on today's snapshot.
 - `references/snapshot-schema.md` — snapshot sheet layout and conventions.
 - `scripts/collectors/` — headless collectors and the Chrome importer; `scripts/chrome/extract_qc.js` — in-page extractor run through Claude in Chrome.
 - `scripts/digest.py` — one-command summary of a run (what changed, freshness, attention candidates). Read this instead of querying the CSVs.
+- `scripts/detail_tables.py` — builds the full detail tables (HTML) for the report from the snapshots. Paste its output into the report; do not retype tables.
 - `references/first-run-setup.md` — one-time setup: preflight, recipients, schedule. Read only on a first run.
 - `scripts/preflight.py` — checks a new environment and says exactly what to fix; `assets/Setup_Guide.pdf` — the setup guide to give the person installing this in another Claude.
 - `scripts/diff_snapshots.py` — compares the current snapshot with the previous one using the thresholds in `config.md`.
@@ -113,7 +114,8 @@ Then apply judgment:
 **Write the report once, as the HTML you will pass to Google Docs** (`h1`, `h2`, `h3`, `ul`, `ol`, `table`, `a`). The email body is its top section as plain text. Do not also write a Markdown copy unless Drive is unavailable.
 
 Follow `references/report-template.md`. Principles:
-- **Short.** "Needs attention today" first, at most ~5 items, then one compact section per module, then data freshness. Detail stays in the sheet.
+- **Detailed, but led by what matters.** "Needs attention today" first (at most ~5 items), then a section per module with a short explanatory paragraph, then the detail tables. Aim for 600 to 1,200 words in the written part.
+- **Full tables come from the script.** Run `python scripts/detail_tables.py daily --data $DATA` and paste its HTML into the report's "Detail tables" section unedited. Do not retype tables.
 - **Specific.** SKU, channel, pincode, before → after, link.
 - **Claims and compliance**: flag title/image compliance issues on Snackible's listings as observed facts against the configured rules. Don't rewrite or propose health claims; the team reviews Snackible's claims.
 - **Report mode** from config: in `report only` mode, describe the issue and its impact but don't prescribe actions.

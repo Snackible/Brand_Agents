@@ -19,6 +19,7 @@ Never skip step 3 to save time: a report without a stored snapshot makes next we
 - `references/snapshot-schema.md` — the snapshot sheet layout and row conventions. Read before writing or reading snapshot rows.
 - `scripts/collectors/` — headless collectors and the Chrome importer; `scripts/chrome/extract_qc.js` — in-page extractor run through Claude in Chrome.
 - `scripts/digest.py` — one-command summary of a run (what changed, freshness, attention candidates). Read this instead of querying the CSVs.
+- `scripts/detail_tables.py` — builds the full detail tables (HTML) for the report from the snapshots. Paste its output into the report; do not retype tables.
 - `references/first-run-setup.md` — one-time setup: preflight, recipients, schedule. Read only on a first run.
 - `scripts/preflight.py` — checks a new environment and says exactly what to fix; `assets/Setup_Guide.pdf` — the setup guide to give the person installing this in another Claude.
 - `scripts/diff_snapshots.py` — compares the current snapshot to the previous one using the thresholds in `config.md`.
@@ -114,7 +115,8 @@ Then add judgment on top of the script output:
 
 Follow `references/report-template.md` exactly. The main principles, so you can handle cases the template doesn't cover:
 
-- **Lead with what changed and matters.** The reader is a marketer with five minutes. The top section is the 3–7 changes worth acting on or knowing, ranked by likely impact on Snackible.
+- **Detailed, but led by what matters.** The written part opens with the 3–7 changes worth acting on or knowing, ranked by likely impact on Snackible, then covers every competitor and how Snackible compares. Aim for 1,200 to 2,000 words; give numbers, pack sizes, channels and links, not generalities.
+- **Full tables come from the script.** Run `python scripts/detail_tables.py weekly --data $DATA` and paste its HTML into the report's "Detail tables" section unedited. Do not retype tables.
 - **Every claim links to its source.**
 - **Health and nutrition claims are observations only.** Report what a competitor states on its pack or listing, verbatim where short, with the link. Don't assess whether a claim is valid, and don't suggest claims Snackible could make: Snackible's own claims are reviewed by the team, not by this report.
 - **Report or recommend** depends on `config.md` → `Report mode`. In `report only` mode (the default), describe changes and why they might matter, but don't add a "Recommended actions" section.

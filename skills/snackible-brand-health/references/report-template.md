@@ -1,6 +1,8 @@
 # Daily report template
 
-Readable in two to three minutes. The top section does the work; everything else is reference. Aim for 300–700 words before the appendix.
+Two parts. The **written part** (about 600 to 1,200 words) is readable in five minutes: the top section does the work, then a short paragraph per module that explains what the numbers mean, not just what they are. The **detail part** is full tables for looking things up. Written part first; detail after config gaps.
+
+Be specific: SKU and pack, channel, before → after, link. Give context for every flagged item (how long it has been like this, whether it recurs, what else changed at the same time).
 
 ```markdown
 # Brand Health: <Day, d Mon YYYY>
@@ -16,6 +18,7 @@ If nothing qualifies, write: "Nothing needs attention today.">
 1. **<SKU> out of stock on Blinkit in 3 of 4 Bengaluru pincodes (was in stock yesterday).** Also 2 "not available" complaints since yesterday. [source](url)
 
 ## Listing health (A)
+<Start with two to four sentences on overall health by channel: share in stock, median discount, anything above MRP. Then:>
 <One line summary: "<n> SKU × channel combinations checked; <n> out of stock, <n> price issues, <n> compliance issues.">
 <Short table of issues only (not every SKU):>
 | SKU | channel | pincode | issue | before → after |
@@ -23,6 +26,7 @@ If nothing qualifies, write: "Nothing needs attention today.">
 <Search rank: keywords that moved ≥ threshold, one line each.>
 
 ## Reviews and sentiment (B)
+<If review themes could not be collected this run, say so plainly and why. Otherwise a short paragraph on the biggest themes, then:>
 - New reviews since yesterday: <n> (<n> negative), by channel.
 - Top complaint themes (7-day): <theme (count) per SKU>.
 - Rating changes: <SKU / channel: 4.3 → 4.2>.
@@ -35,6 +39,11 @@ If nothing qualifies, write: "Nothing needs attention today.">
 - Clicks (7-day): <n> (<±%> vs previous). Branded <n> (<±%>), non-branded <n> (<±%>). Data through <date>.
 - Keywords that moved: <keyword: 6 → 11>.
 - Broken pages / collections: <path: status or "0 products">.
+
+## Detail tables
+<Paste the output of `python scripts/detail_tables.py daily --data $DATA` here, unedited: every listing by channel
+(stock, MRP, price, discount, price vs yesterday, rating, reviews, link), search rank by keyword with movement, and
+mentions found. It is built from the snapshots, so do not retype or summarise it.>
 
 ## Data freshness
 | module | status | snapshot date | rows | note |
