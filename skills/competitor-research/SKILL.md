@@ -38,12 +38,13 @@ Read `config.md`. Note:
 
 Never skip a source silently and never work around a block. Whenever a step needs something only a person can do, stop, say in plain words exactly what to do, and wait for their reply before going on. Ask again on every run: an earlier "skip" does not carry over.
 
-**Up front, in one message, before collecting** (use the question tool if this Claude has one, otherwise plain text; offer "I've done it" and "Skip this time" for each item):
-- Claude in Chrome connected and responding (needed for Blinkit and Zepto).
-- Signed in, in that Chrome, to each login-gated site in `config.md` (Instagram, Amazon). Open one page of the site and run `scripts/chrome/check_login.js`; never sign in yourself.
-- Google Drive and Gmail connected (needed to create and send the report).
-- Anything listed in `$DATA/pending_actions.md` from an earlier unattended run.
-Wait for the answer, re-check whatever they say they did, and only then collect. If they skip something, mark that module `needs_login` or not connected in the report; do not guess.
+**Check first, ask only if a check fails.** Never ask the person whether something is available when you can test it yourself. Before collecting, run these checks silently:
+- Claude in Chrome: look for its tools (load them with ToolSearch if deferred) and make one real call, such as listing the tabs. It works if the call returns.
+- Login-gated sites in `config.md` (Instagram, Amazon): after Chrome works, open one page of each site and run `scripts/chrome/check_login.js`. Never sign in yourself.
+- Google Drive and Gmail: look for their tools in your tool list.
+- `$DATA/pending_actions.md`: read it for items left by an earlier unattended run.
+
+If every check passes, say nothing about it and go straight to collecting. If one or more fail, send one message that lists only what failed, each with the single thing to do (use the question tool if this Claude has one, otherwise plain text; offer "I've done it" and "Skip this time"). Wait, re-run the failed check after they say they did it, and only then collect. If they skip something, mark that module `needs_login` or not connected in the report; do not guess.
 
 **Mid-run blockers** (a CAPTCHA, a sign-in wall that appears, a site refusing the page, a connector or Chrome dropping out): stop at that moment, say what happened and what to do, and wait.
 
