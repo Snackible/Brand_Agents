@@ -77,6 +77,9 @@ window.__qc = () => {
   const brands = (window.__qcBrands || []).map(norm);
   const keep = all.filter(it => !brands.length || brands.some(b => norm(it[0]).includes(b)));
 
+  const sp = new URLSearchParams(location.search);
+  const query = sp.get("q") || sp.get("query") || "";
+  if (window.__qcLast !== query) { window.__qcFrom = 0; window.__qcLast = query; }  // a new search starts from the top
   const from = window.__qcFrom || 0;
   const items = [];
   let size = 0;
@@ -89,12 +92,12 @@ window.__qc = () => {
   }
   window.__qcFrom = from + items.length >= keep.length ? 0 : from + items.length;
 
-  const sp = new URLSearchParams(location.search);
-  const query = sp.get("q") || sp.get("query") || "";
   const loc = lines.find(l => /^(delivering to|deliver to|delivery to)/i.test(l)) || "";
   // The query is returned as its own field; a URL with ?q= in the output can be blocked by the browser tool.
   const out = { channel, query, from, total: all.length, items };
   if (loc) out.location = loc;
   return JSON.stringify(out);
 };
+// Returns the rest of a long result if the last call was cut short, otherwise just {"done":true}.
+window.__qc2 = () => window.__qcFrom ? window.__qc() : '{"done":true}';
 window.__qc()

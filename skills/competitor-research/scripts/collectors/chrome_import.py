@@ -96,9 +96,12 @@ def run_competitors(a, pages):
 
 def run_own(a, pages):
     snap = Snapshot()
+    only = {q.strip().lower() for q in a.queries.split(",")} if a.queries else None
     for d in pages:
         ch, url = d["channel"], url_of(d)
         kw = query_of(d)
+        if only and kw.lower() not in only:
+            continue  # a keyword belonging to the other agent
         seen = set()
         if not d.get("total", len(d["items"])):
             snap.status("listing", f"{a.brand} | {ch}", "failed", f"no products parsed from {url} (login wall or layout change)", ch)
@@ -129,6 +132,7 @@ def main():
     ap.add_argument("files", nargs="+")
     ap.add_argument("--config")
     ap.add_argument("--brand", default="Snackible")
+    ap.add_argument("--queries", help="own mode: comma list of keywords to include (default: all in the files)")
     ap.add_argument("--out", required=True)
     a = ap.parse_args()
     pages = load(a.files)
