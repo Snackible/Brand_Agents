@@ -1,25 +1,38 @@
 # Weekly report template
 
-Use this structure. The report has two parts: a **written part** (about 1,200 to 2,000 words: top changes, a section for every competitor, how Snackible compares, patterns) that a marketer can read in ten minutes, and a **detail part** of full tables for looking things up. The written part comes first; the detail part follows the config-gaps section.
+Use this structure. The report has two parts: a **written part** (about 600 to 1,000 words) that a marketer can read in three to five minutes, and a **detail part** of full tables for looking things up. Nothing is lost by keeping the written part tight, because every number is in the detail tables. The written part comes first; the detail part follows the config-gaps section.
 
-Be specific and complete rather than short: name the product, pack size, channel, before and after numbers and the source link in every claim. Cover every competitor in the config, including those with no change (say where they stand now: price per 100 g, discount depth, active ads, rating).
+**Make it snappy.**
+- Bullets, not paragraphs. One idea per bullet, 25 words or fewer, starting with a bold lead-in (brand, product or topic).
+- Put the number and the change first (₹249 → ₹219, −12%), the reason it matters second, the link last.
+- Do not repeat what a detail table already shows. Point to it instead ("full list: Price changes table"). Mention only what matters or what a table cannot say.
+- Say each caveat once, in a single italic line under the title or in Config gaps, not inside every bullet.
+- A competitor with no change gets its "Where they stand" line and nothing else.
+- Still cover every competitor, and still name product, pack, channel, before and after, and the source link for every claim.
 
 ```markdown
 # Competitor Weekly: W<week> <year> (<Mon d> – <Sun d>)
 
-_Compared with snapshot of <previous date>. Modules: <n> ok, <n> partial, <n> not connected. See Data freshness._
+_Compared with snapshot of <previous date>. Modules: <n> ok, <n> partial, <n> not connected. <One short caveat line if needed.>_
+
+## At a glance
+<A table of 4 to 6 headline numbers: first row is the label, second row is the value. Plain th and td. For example:>
+| Price moves of 5% or more | New listings | Removed listings | New Meta ads | Competitors with a change |
+|---|---|---|---|---|
+| 12 | 4 | 2 | 9 | 5 of 6 |
 
 ## Top changes this week
 <3–7 numbered items, ranked by likely impact on Snackible. Each item: one bold sentence saying
-what changed, then one or two sentences of context (why it might matter), then source links.
+what changed, then one short sentence of context (why it might matter), then the source link.
+Two lines at most per item.
 Merge related signals from different modules into one item (launch + ads + price cut = one story).>
 
 1. **<Brand> <what changed>.** <Context.> [source](url)
 
 ## By competitor
-<One block for EVERY competitor, in config priority order. Start each block with a "Where they stand" line
-(price per 100 g vs Snackible, discount depth, ad intensity, rating), then the lines below. For a competitor with
-no change, write the "Where they stand" line and "No notable change this week." Do not drop them.>
+<One block for EVERY competitor, in config priority order. Start each block with a one-line "Where they stand"
+(price per 100 g, discount depth, ad count, rating), then at most four one-line bullets for what changed. For a
+competitor with no change, write the "Where they stand" line only. Do not drop competitors.>
 
 ### <Brand>
 **Where they stand:** <e.g. "Median ₹190 per 100 g across 80 items (13% off); 11 active Meta ads; Amazon rating 4.3 over 34K reviews.">
@@ -34,11 +47,11 @@ no change, write the "Where they stand" line and "No notable change this week." 
 <Only include lines that have something.>
 
 ## How Snackible compares
-<3–6 bullets placing Snackible against the competitor set where comparable data exists: price per 100 g in the same
+<3–5 bullets placing Snackible against the competitor set where comparable data exists: price per 100 g in the same
 category and channel, discount depth, ad activity, rating. Observations only; no claims advice.>
 
 ## Patterns across competitors
-<3–6 bullets. e.g. "Three of six brands are pushing corporate Diwali hampers under ₹1,000.">
+<3–4 bullets. e.g. "Three of six brands are pushing corporate Diwali hampers under ₹1,000.">
 
 ## Recommended actions
 <Only when config Report mode is "report + recommendations". Otherwise leave this section out entirely.>

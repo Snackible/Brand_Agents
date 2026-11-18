@@ -1,29 +1,36 @@
 # Daily report template
 
-Two parts. The **written part** (about 600 to 1,200 words) is readable in five minutes: the top section does the work, then a short paragraph per module that explains what the numbers mean, not just what they are. The **detail part** is full tables for looking things up. Written part first; detail after config gaps.
+Two parts. The **written part** (about 350 to 650 words) is readable in two to three minutes: a row of headline numbers, then the items that need attention, then a few bullets per module. The **detail part** is full tables for looking things up. Nothing is lost by keeping the written part tight, because every number is in the detail tables. Written part first; detail after config gaps.
 
-Be specific: SKU and pack, channel, before → after, link. Give context for every flagged item (how long it has been like this, whether it recurs, what else changed at the same time).
+**Make it snappy.**
+- Bullets, not paragraphs. One idea per bullet, 25 words or fewer, starting with a bold lead-in (SKU, channel or topic).
+- Number and change first (₹65 → ₹74, +14%), context second, link last.
+- Do not repeat what a detail table already shows (search ranks, every listing). Name only the movers and point to the table.
+- Say each caveat once (under the title or in Config gaps), not inside every bullet.
+- Still give SKU and pack, channel, before → after and the link for every flagged item, with one line of context (how long, whether it recurs).
 
 ```markdown
 # Brand Health: <Day, d Mon YYYY>
 
-_Compared with snapshot of <previous date>. Modules: <n> ok, <n> partial, <n> not connected._
+_Compared with snapshot of <previous date>. Modules: <n> ok, <n> partial, <n> not connected. <One short caveat line if needed.>_
+
+## At a glance
+<A table of 4 to 6 headline numbers: first row is the label, second row is the value. Plain th and td. For example:>
+| In stock on snackible.com | Amazon avg rating | Out of stock | Price moves of 5% or more | New mentions |
+|---|---|---|---|---|
+| 97 of 99 | 3.91 | 2 | 2 | 1 |
 
 ## Needs attention today
 <0–5 numbered items, ranked by urgency × revenue impact. Each: one bold sentence with SKU, channel
-(and pincode if relevant) and the change, then one sentence of context, then the link.
+(and pincode if relevant) and the change, then one short sentence of context, then the link. Two lines at most.
 Merge related signals across modules into one item.
 If nothing qualifies, write: "Nothing needs attention today.">
 
 1. **<SKU> out of stock on Blinkit in 3 of 4 Bengaluru pincodes (was in stock yesterday).** Also 2 "not available" complaints since yesterday. [source](url)
 
 ## Listing health (A)
-<Start with two to four sentences on overall health by channel: share in stock, median discount, anything above MRP. Then:>
-<One line summary: "<n> SKU × channel combinations checked; <n> out of stock, <n> price issues, <n> compliance issues.">
-<Short table of issues only (not every SKU):>
-| SKU | channel | pincode | issue | before → after |
-|---|---|---|---|---|
-<Search rank: keywords that moved ≥ threshold, one line each.>
+<Three to five bullets: stock by channel, price moves, ratings below the threshold, anything above MRP.>
+<Search rank: one bullet per channel naming only the keywords that moved or were lost; the full list is in the Search rank table.>
 
 ## Reviews and sentiment (B)
 <If review themes could not be collected this run, say so plainly and why. Otherwise a short paragraph on the biggest themes, then:>

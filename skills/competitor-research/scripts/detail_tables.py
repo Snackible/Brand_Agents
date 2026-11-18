@@ -215,9 +215,15 @@ def weekly(cur, prev):
     if ig:
         out.append("<h2>Detail: Instagram</h2>")
         pc = ents(prev, "content") if prev else {}
-        rows = [[e.split(" | ")[0], fmt(num(m["followers"])), delta(num(m["followers"]), num(pc.get(e, {}).get("followers")), 0, "", True)
-                 if prev else "-"] for e, m in sorted(ig, key=lambda x: -(num(x[1]["followers"]) or 0))]
-        out.append(table(["brand", "followers", "change vs last"], rows))
+        def chg(e, m):
+            before = num(pc.get(e, {}).get("followers"))
+            if before is None:
+                return "first snapshot (no earlier count)"
+            return delta(num(m["followers"]), before, 0, "", True)
+        rows = [[e.split(" | ")[0], fmt(num(m["followers"])), chg(e, m), link(m.get("_url"), "profile")]
+                for e, m in sorted(ig, key=lambda x: -(num(x[1]["followers"]) or 0))]
+        out.append(table(["brand", "followers", "change vs last", "source"], rows))
+        out.append("<p><i>Follower counts are rounded as shown on the profile (for example 178K), so small changes do not show.</i></p>")
     return "\n".join(out)
 
 
