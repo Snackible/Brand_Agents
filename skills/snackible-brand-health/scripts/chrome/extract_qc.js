@@ -41,12 +41,13 @@ window.__qc = () => {
       if (name && prices.length) all.push([name, weight, prices[0], prices[1] || prices[0], false]);
     });
   } else if (channel === "Zepto") {
-    // ADD, price, [mrp], name, [tags...], "1 pack (77 g)"
+    // ADD, price, [mrp], ["₹N", "OFF" badge], name, [tags...], "1 pack (77 g)"
     lines.forEach((l, i) => {
       if (l !== "ADD") return;
       let j = i + 1;
       const prices = [];
       while (j < lines.length && isRupee(lines[j]) && prices.length < 2) prices.push(rupee(lines[j++]));
+      while (j < lines.length && (isRupee(lines[j]) || /^(OFF|\d+% OFF)$/i.test(lines[j]))) j++;  // discount badge ("₹2" "OFF") sits before the name
       const name = (lines[j] || "").split("|")[0].trim();
       let weight = "";
       for (let k = j + 1; k < Math.min(j + 6, lines.length); k++) {

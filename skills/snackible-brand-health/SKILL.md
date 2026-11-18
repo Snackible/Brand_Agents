@@ -22,6 +22,7 @@ Don't skip step 3: tomorrow's report depends on today's snapshot.
 - `scripts/collectors/` — headless collectors and the Chrome importer; `scripts/chrome/extract_qc.js` — in-page extractor run through Claude in Chrome.
 - `scripts/digest.py` — one-command summary of a run (what changed, freshness, attention candidates). Read this instead of querying the CSVs.
 - `scripts/detail_tables.py` — builds the full detail tables (HTML) for the report from the snapshots. Paste its output into the report; do not retype tables.
+- `scripts/assemble_report.py` — joins your written part with the detail tables and prints the file reference for the Drive upload.
 - `references/first-run-setup.md` — one-time setup: preflight, recipients, schedule. Read only on a first run.
 - `scripts/preflight.py` — checks a new environment and says exactly what to fix; `assets/Setup_Guide.pdf` — the setup guide to give the person installing this in another Claude.
 - `scripts/diff_snapshots.py` — compares the current snapshot with the previous one using the thresholds in `config.md`.
@@ -115,7 +116,7 @@ Then apply judgment:
 
 Follow `references/report-template.md`. Principles:
 - **Detailed, but led by what matters.** "Needs attention today" first (at most ~5 items), then a section per module with a short explanatory paragraph, then the detail tables. Aim for 600 to 1,200 words in the written part.
-- **Full tables come from the script.** Run `python scripts/detail_tables.py daily --data $DATA` and paste its HTML into the report's "Detail tables" section unedited. Do not retype tables.
+- **Full tables come from the script.** Write only the written part of the report (title down to config gaps) to `reports/<date>/part1.html`, then run `python scripts/assemble_report.py daily --data $DATA --part reports/<date>/part1.html --out reports/<date>/report.html`. It appends the detail tables (built from the snapshots by `scripts/detail_tables.py`), saves the full report and prints a `FILE_REF` line. Never retype tables.
 - **Specific.** SKU, channel, pincode, before → after, link.
 - **Claims and compliance**: flag title/image compliance issues on Snackible's listings as observed facts against the configured rules. Don't rewrite or propose health claims; the team reviews Snackible's claims.
 - **Report mode** from config: in `report only` mode, describe the issue and its impact but don't prescribe actions.
@@ -130,7 +131,7 @@ Delivery settings live in the Drive file `Snackible Agents Settings: brand_healt
 ### Each run
 
 Every run after setup, scheduled or not:
-1. Create a Google Doc titled `Brand Health: <Day, d Mon YYYY>` (in `folder_id` if set) containing the report.
+1. Create a Google Doc titled `Brand Health: <Day, d Mon YYYY>` (in `folder_id` if set) containing the report. Upload it from the file, not from text you type: call Drive `create_file` with `contentMimeType` `text/html` and `base64Content` set to the `FILE_REF` string from `assemble_report.py` (the app reads the file itself, so the tables cost no tokens). If that reference is rejected, fall back to passing the HTML as `textContent`.
 2. **Share the Doc** with each recipient as a viewer (Drive `share_file`), so the emailed link opens for them. The Doc stays private to everyone else.
 3. **Email** with Gmail: if `mode` is `send`, `send_message` to the saved recipients; if `draft`, `create_draft` and say it is waiting. Subject: the Doc title plus ` (<n> need attention)`. Body: the "Needs attention today" (or "Baseline: current issues" on the first run) section as plain text plus the Doc link. No attachments and no raw data. If this run left open items for the person (section 1b), start the subject with `ACTION NEEDED: ` and list them at the top of the body. Send only to the saved addresses (no extra Cc or Bcc).
 4. If Docs, Drive sharing or Gmail is unavailable, write the report as Markdown, save `brand_health_<YYYY-MM-DD>.md`, and say which delivery steps did not happen. Do not send a partial or unsourced report.
