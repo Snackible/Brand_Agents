@@ -22,6 +22,22 @@ window.__qc = () => {
     : host.includes("zepto") ? "Zepto"
     : host.includes("swiggy") ? "Swiggy Instamart"
     : host.includes("bigbasket") ? "BigBasket" : host;
+  if (channel === "Blinkit") {
+    // Sponsored cards carry an "Ad" badge drawn as an image (ad_without_bg.png), not as text, so innerText never
+    // shows it. Put a text flag after that card's ADD button so the parsing below can see it.
+    document.querySelectorAll("img").forEach(img => {
+      if (!/\/ui\/ad_/i.test(img.src) || img.dataset.qcAd) return;
+      img.dataset.qcAd = "1";
+      for (let c = img.parentElement, k = 0; c && k < 10; c = c.parentElement, k++) {
+        if ((c.innerText || "").split("\n").filter(t => t.trim() === "ADD").length === 1) {
+          const f = document.createElement("div");
+          f.textContent = "AD_FLAG";
+          c.appendChild(f);
+          break;
+        }
+      }
+    });
+  }
   const lines = document.body.innerText.split("\n").map(s => s.trim()).filter(Boolean);
   const isRupee = s => /^₹\s?[\d,]+(\.\d+)?$/.test(s);
   const isNum = s => /^[\d,]+(\.\d+)?$/.test(s);
@@ -38,7 +54,7 @@ window.__qc = () => {
       while (j >= 0 && isRupee(lines[j]) && prices.length < 2) prices.unshift(rupee(lines[j--]));
       const weight = lines[j] && isWeight(lines[j]) ? lines[j--] : "";
       const name = lines[j] || "";
-      if (name && prices.length) all.push([name, weight, prices[0], prices[1] || prices[0], false]);
+      if (name && prices.length) all.push([name, weight, prices[0], prices[1] || prices[0], lines[i + 1] === "AD_FLAG"]);
     });
   } else if (channel === "Zepto") {
     // ADD, price, [mrp], ["₹N", "OFF" badge], name, [tags...], "1 pack (77 g)"

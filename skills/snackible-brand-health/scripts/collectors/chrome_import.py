@@ -78,6 +78,7 @@ def run_competitors(a, pages):
             continue
         note = f"query '{query_of(d)}'; location: {d.get('location', '')}"
         seen = set()
+        ad_seen = {}
         for name, weight, price, mrp, sponsored, *_ in d["items"]:
             b = brand_of(name, brands)
             if not b:
@@ -90,6 +91,12 @@ def run_competitors(a, pages):
             snap.add("sku_tracker", entity, "listed", 1, "", ch, url, note)
             snap.add("sku_tracker", entity, "pack_size_g", grams, "g", ch, url)
             price_rows(snap, "price", entity, max(mrp, price), price, grams, ch, url, note)
+            ad_seen.setdefault(b, [])
+            if sponsored:
+                ad_seen[b].append(f"{name[:50]} {weight}".strip())
+        for b, ad_names in ad_seen.items():  # sponsored ("Ad" badge) results for each brand on this search
+            snap.add("sponsored", f"{b} | {ch} | {query_of(d)}", "sponsored_listings", len(ad_names), "count", ch, url,
+                     "; ".join(ad_names)[:200])
     snap.write(a.out)
     print(f"wrote {len(snap.rows)} rows -> {a.out}")
 
@@ -121,6 +128,8 @@ def run_own(a, pages):
             note = f"found via '{kw}'; location: {d.get('location', '')}"
             snap.add("listing", entity, "in_stock", 1, "", ch, url, note)
             price_rows(snap, "listing", entity, max(mrp, price), price, None, ch, url, note)
+        ads = [f"{it[0][:50]} {it[1]}".strip() for it in mine if it[4]]
+        snap.add("sponsored", f"{a.brand} | {ch} | {kw}", "sponsored_listings", len(ads), "count", ch, url, "; ".join(ads)[:200])
     snap.write(a.out)
     print(f"wrote {len(snap.rows)} rows -> {a.out}")
 

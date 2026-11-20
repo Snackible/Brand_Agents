@@ -71,6 +71,28 @@ def parts(entity):
 
 # ---------------------------------------------------------------- weekly
 
+def sponsored_table(cur):
+    """Sponsored ("Ad" badge) results seen on delivery-app searches. Blinkit only: Zepto's website shows no ad badge."""
+    sp = ents(cur, "sponsored")
+    if not sp:
+        return []
+    rows, checked = [], 0
+    for e, m in sorted(sp.items()):
+        if parts(e)[1] == "Zepto":
+            continue  # the website shows no ad badge, so a zero there would mean nothing
+        checked += 1
+        n = num(m.get("sponsored_listings"))
+        if n:
+            p = parts(e)
+            rows.append([p[0], p[1], p[2], fmt(n), cur[("sponsored", e, "sponsored_listings")]["notes"][:120]])
+    out = ["<h2>Detail: sponsored placements on delivery apps</h2>"]
+    note = (f"Results carrying the app's \"Ad\" badge, from {checked} brand and keyword searches on the website. "
+            "Blinkit only: Zepto's website shows no ad badge, so Zepto sponsored placements need the phone app.")
+    out.append(table(["brand", "app", "search keyword", "sponsored listings", "which products"], rows, note) if rows
+               else f"<p>No sponsored results seen. <i>{note}</i></p>")
+    return out
+
+
 def weekly(cur, prev):
     out = []
     price, prev_price = ents(cur, "price"), ents(prev, "price") if prev else {}
@@ -195,6 +217,7 @@ def weekly(cur, prev):
         out.append("<h2>Detail: delivery apps (Blinkit, Zepto)</h2>")
         out.append(table(["brand", "app", "items found", "median ₹/100g", "examples"], q_rows,
                          "Prices are for the location set in the browser; they vary by pincode."))
+    out += sponsored_table(cur)
 
     # 7 Top Amazon products per brand
     out.append("<h2>Detail: top Amazon products per brand (by review count)</h2>")
@@ -274,6 +297,8 @@ def daily(cur, prev):
         rows.append([parts(e)[0], where(e), shown, before, move, note])
     rows.sort(key=lambda r: (r[1], r[0]))
     out.append(table(["keyword", "channel", "position now", "position before", "move", "top Snackible result"], rows, limit=80))
+
+    out += sponsored_table(cur)
 
     # mentions
     M = ents(cur, "mention_items")
