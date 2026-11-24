@@ -72,7 +72,7 @@ def parts(entity):
 # ---------------------------------------------------------------- weekly
 
 def sponsored_table(cur):
-    """Sponsored ("Ad" badge) results seen on delivery-app searches. Blinkit only: Zepto's website shows no ad badge."""
+    """Sponsored ("Ad" badge) results seen on delivery-app searches (Blinkit, Instamart). Zepto's website shows no ad badge."""
     sp = ents(cur, "sponsored")
     if not sp:
         return []
@@ -87,7 +87,7 @@ def sponsored_table(cur):
             rows.append([p[0], p[1], p[2], fmt(n), cur[("sponsored", e, "sponsored_listings")]["notes"][:120]])
     out = ["<h2>Detail: sponsored placements on delivery apps</h2>"]
     note = (f"Results carrying the app's \"Ad\" badge, from {checked} brand and keyword searches on the website. "
-            "Blinkit only: Zepto's website shows no ad badge, so Zepto sponsored placements need the phone app.")
+            "Blinkit and Instamart only: Zepto's website shows no ad badge, so Zepto sponsored placements need the phone app.")
     out.append(table(["brand", "app", "search keyword", "sponsored listings", "which products"], rows, note) if rows
                else f"<p>No sponsored results seen. <i>{note}</i></p>")
     return out

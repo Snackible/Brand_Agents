@@ -28,7 +28,7 @@ Where SKUs and prices are tracked. `script` = collected by `scripts/collectors` 
 | Amazon.in | on | script: search pages, top 15 per brand |
 | Blinkit | on | chrome, browser's current location |
 | Zepto | on | chrome, browser's current location |
-| Swiggy Instamart | off | chrome, no login needed; read the page promptly after it loads, because a login prompt can appear a few seconds later |
+| Swiggy Instamart | on | chrome, no sign-in needed once a delivery location is set in Chrome. The person sets that location once (the agent never types an address); read the page promptly after it loads, because a login prompt can appear a few seconds later. Sponsored results carry an "Ad" or "Sponsored" tag |
 | BigBasket | needs feed | blocks automated access; use the shared scrape |
 
 Quick-commerce prices vary by location. The Chrome collectors read whatever location the browser has set. Note it in the report; a per-pincode matrix needs the shared scrape.

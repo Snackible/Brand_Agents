@@ -29,7 +29,7 @@ Own brands: TODO (default: everything on snackible.com is reported)
 | Amazon.in | on | script: brand search page (price, MRP, rating, review count) and keyword rank |
 | Blinkit | on | chrome: search for each tracked keyword, browser's current location |
 | Zepto | on | chrome: same |
-| Swiggy Instamart | off | chrome: no login needed; read promptly after load (a login prompt can appear later) |
+| Swiggy Instamart | on | chrome: no sign-in needed once a delivery location is set in Chrome. The person sets that location once (the agent never types an address); read promptly after load (a login prompt can appear later). Sponsored results carry an "Ad" or "Sponsored" tag |
 | BigBasket | needs feed | blocks automated access; shared scrape |
 | Google reviews | needs feed | Google Business Profile (TODO location link) |
 

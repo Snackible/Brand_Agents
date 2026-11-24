@@ -73,7 +73,7 @@ window.__qc = () => {
       if (name && prices.length) all.push([name, weight, prices[0], prices[1] || prices[0], false]);
     });
   } else if (channel === "Swiggy Instamart") {
-    // "NN MINS", name, [description...], weight, ["x% OFF"], price, [mrp], ["Ad"|"Sponsored"]
+    // ["Ad"|"Sponsored"], "NN MINS", name, [description...], weight, ["x% OFF"], price, [mrp]
     const starts = lines.map((l, i) => (/^\d+\s*MINS?$/i.test(l) ? i : -1)).filter(i => i >= 0);
     starts.forEach((s, n) => {
       const end = starts[n + 1] ?? Math.min(lines.length, s + 14);
@@ -82,7 +82,7 @@ window.__qc = () => {
       const w = block.findIndex(isWeight);
       if (!name || w < 0) return;
       const nums = block.slice(w + 1).filter(isNum).map(rupee);
-      const sponsored = block.some(b => /^(ad|sponsored)$/i.test(b));
+      const sponsored = /^(ad|sponsored)$/i.test(lines[s - 1] || "");  // the "Ad" tag sits on the line BEFORE its "NN MINS"
       if (nums.length) all.push([name, block[w], nums[0], nums[1] || nums[0], sponsored]);
     });
   }

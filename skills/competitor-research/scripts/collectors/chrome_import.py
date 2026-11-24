@@ -128,7 +128,7 @@ def run_own(a, pages):
             note = f"found via '{kw}'; location: {d.get('location', '')}"
             snap.add("listing", entity, "in_stock", 1, "", ch, url, note)
             price_rows(snap, "listing", entity, max(mrp, price), price, None, ch, url, note)
-        ads = [f"{it[0][:50]} {it[1]}".strip() for it in mine if it[4]]
+        ads = list(dict.fromkeys(f"{it[0][:50]} {it[1]}".strip() for it in mine if it[4]))  # distinct products (a carousel can repeat one)
         snap.add("sponsored", f"{a.brand} | {ch} | {kw}", "sponsored_listings", len(ads), "count", ch, url, "; ".join(ads)[:200])
     snap.write(a.out)
     print(f"wrote {len(snap.rows)} rows -> {a.out}")
